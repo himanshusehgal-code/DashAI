@@ -6,12 +6,66 @@
   <title>AI-Powered Data Analyst Dashboard</title>
   <style>
     * { box-sizing: border-box; } 
-    :root { --bg: #0b0e14; --card: #161b22; --text: #c9d1d9; --primary: #1f6feb; --accent: #238636; --border: #30363d; --warning: #ff9800; --danger: #f85149; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+    :root { 
+        --bg: #0b0e14; 
+        --card: #161b22; 
+        --text: #c9d1d9; 
+        --primary: #1f6feb; 
+        --accent: #238636; 
+        --border: #30363d; 
+        --warning: #ff9800; 
+        --danger: #f85149; 
+        --yt-red: #FF0000;
+    }
     
+    body { 
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+        background: var(--bg); 
+        color: var(--text); 
+        margin: 0; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        padding: 40px 20px; 
+    }
+    
+    /* YouTube Channel Link - Right Side */
+    .channel-sidebar {
+        position: fixed;
+        right: 20px;
+        top: 40px;
+        z-index: 100;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 10px 15px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        transition: 0.3s;
+    }
+    .channel-sidebar:hover {
+        transform: translateX(-5px);
+        border-color: var(--yt-red);
+    }
+    .yt-icon {
+        width: 24px;
+        height: 24px;
+        background: var(--yt-red);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .landing-container { max-width: 800px; width: 100%; padding-bottom: 50px; }
     
-    .landing-hero { text-align: center; margin-bottom: 40px; padding: 40px 20px; background: linear-gradient(180deg, #161b22 0%, #0b0e14 100%); border-radius: 15px; border: 1px solid var(--border); }
+    .landing-hero { text-align: center; margin-bottom: 40px; padding: 40px 20px; background: linear-gradient(180deg, #161b22 0%, #0b0e14 100%); border-radius: 15px; border: 1px solid var(--border); position: relative; overflow: hidden; }
     .landing-hero h1 { color: var(--primary); margin-top: 0; font-size: 28px; }
     .landing-hero p { color: #8b949e; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
     
@@ -22,6 +76,33 @@
     .landing-section ul { padding-left: 20px; }
     .landing-section li { margin-bottom: 10px; }
     .landing-section b { color: #c9d1d9; }
+
+    /* Video Embed Styling */
+    .video-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        height: 0;
+        margin: 20px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .short-container {
+        max-width: 315px;
+        margin: 20px auto;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
     .faq-item { margin-bottom: 20px; border-bottom: 1px dashed var(--border); padding-bottom: 15px; }
     .faq-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -34,13 +115,30 @@
     .cta-container { text-align: center; margin: 30px 0; }
     
     a.main-btn { display: inline-block; background: var(--primary); color: white; padding: 15px 40px; font-size: 16px; font-weight: bold; border-radius: 6px; text-decoration: none; transition: 0.2s; box-shadow: 0 4px 15px rgba(31, 111, 235, 0.4); }
-    a.main-btn:hover { filter: brightness(1.1); }
+    a.main-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
     a.btn-green { background: var(--accent); box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4); }
 
     footer { text-align: center; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; color: #8b949e; font-size: 12px; }
+
+    @media (max-width: 1000px) {
+        .channel-sidebar {
+            position: relative;
+            right: auto;
+            top: auto;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+    }
   </style>
 </head>
 <body>
+
+  <a href="https://youtube.com/@sheetbossbyshegal?si=ryjAIwo5o_lv7kao" target="_blank" class="channel-sidebar">
+    <div class="yt-icon">
+        <svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </div>
+    Sheet Boss By Sehgal
+  </a>
 
   <div class="landing-container">
     
@@ -60,6 +158,11 @@
         <li><b>Visual Output:</b> Get a live chart and a three-part breakdown: The Issue, The Insight, and The Action.</li>
         <li><b>Token System & Pricing:</b> 1 query = 1 Token. Top up instantly using our Razorpay secure gateway. Tokens are priced dynamically inside the dashboard based on your usage tier.</li>
       </ul>
+
+      <h3>Video Guide: Full Working Tutorial & Permissions</h3>
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/l0Oj0F-1oYc" title="Working Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
     </div>
 
     <div class="landing-section">
@@ -71,6 +174,11 @@
         Kindly share your <b>UTR number or a payment screenshot</b> with us at <b>himanshusehgal320@gmail.com</b> or WhatsApp us at <b>8569890156</b>. Our team will verify the transaction and manually credit the tokens to your account within 24-48 hours.</p>
       </div>
 
+      <h3>Tutorial: How to Make a Payment</h3>
+      <div class="short-container">
+        <iframe width="315" height="560" src="https://www.youtube.com/embed/YVDoap37vE4" title="Payment Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
       <h3>Terms & Conditions</h3>
       <p>By using our service, you agree to our terms. Users are responsible for the data they connect. We do not claim ownership over your data. Accounts attempting to misuse the token system or API limits will be suspended.</p>
 
@@ -79,8 +187,8 @@
 
       <h3>Contact Us</h3>
       <p>
-         AI-Powered Data Analyst Dashboard<br>
-        Email:</b> himanshusehgal320@gmail.com<br>
+        <b>AI-Powered Data Analyst Dashboard</b><br>
+        <b>Email:</b> himanshusehgal320@gmail.com<br>
         <b>Phone / WhatsApp:</b> 8569890156<br>
         <b>Operating Address:</b> Kalka, Haryana, 133302
       </p>
