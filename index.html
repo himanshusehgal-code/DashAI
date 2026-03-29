@@ -135,6 +135,40 @@
   margin-bottom: 15px;
   filter: drop-shadow(0 0 10px rgba(31,111,235,0.6));
 }
+    <style>
+section {
+  padding: 60px 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+
+.trust-container, .use-container {
+  display: flex;
+  justify-content: center;
+}
+
+.trust-card, .use-card {
+  background: #111;
+  color: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  text-align: left;
+  line-height: 1.8;
+  font-size: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+
+.trust-card:hover, .use-card:hover {
+  transform: translateY(-5px);
+}
+</style>
   </style>
 </head>
 <body>
@@ -152,6 +186,37 @@
     <img src="logo.png" class="hero-logo" alt="DashAI Logo">
       <h1>AI-Powered Data Analyst Dashboard</h1>
       <p>Transform raw spreadsheet data into meaningful business strategies. Simply "ask" your data questions in plain English. Our AI analyzes trends, generates visual charts, and provides actionable steps to improve your business performance.</p>
+      
+      <!-- ===== WHY TRUST SECTION ===== -->
+<section class="trust-section">
+  <h2>🔒 Why Trust This App?</h2>
+
+  <div class="trust-container">
+    <div class="trust-card">
+      ✔ Secure Google Login (OAuth 2.0)<br>
+      ✔ Uses official Google APIs<br>
+      ✔ Your data stays in your Google account<br>
+      ✔ No third-party data storage<br><br>
+      💳 Razorpay Integrated for Safe Payments
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== WHY USE SECTION ===== -->
+<section class="use-section">
+  <h2>⚡ Why Use This Dashboard?</h2>
+
+  <div class="use-container">
+    <div class="use-card">
+      ✔ Real-time Data Tracking<br>
+      ✔ Automated Reports<br>
+      ✔ Zero Manual Work<br>
+      ✔ Works directly with Google Sheets<br>
+      ✔ Supports Data Upload (Excel, CSV, etc.)
+    </div>
+  </div>
+</section>
       
       <a href="https://script.google.com/macros/s/AKfycbxJ9Ai77vksG0Se8nhNNTQw_pT8qbIPWGykXgqHc_nIjpjxScRQ-EQKuC8f6uJs88dg/exec" class="main-btn">🔌 Connect & Authorize Now</a>
     </div>
