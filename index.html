@@ -168,10 +168,49 @@ h2 {
 .trust-card:hover, .use-card:hover {
   transform: translateY(-5px);
 }
-</style>
+
+#maintenance-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0b0e14;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.maintenance-box {
+  text-align: center;
+  background: #161b22;
+  padding: 40px 50px;
+  border-radius: 12px;
+  border: 1px solid #30363d;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.maintenance-box h1 {
+  color: #f85149;
+  margin-bottom: 15px;
+}
+
+.maintenance-box p {
+  color: #8b949e;
+  font-size: 14px;
+}
   </style>
 </head>
 <body>
+
+<!-- MAINTENANCE OVERLAY -->
+<div id="maintenance-screen">
+  <div class="maintenance-box">
+    <h1>🚧 Website Under Maintenance</h1>
+    <p>We are upgrading the system for a better experience.<br>Please check back later.</p>
+  </div>
+</div>
 
   <a href="https://youtube.com/@sheetbossbyshegal?si=ryjAIwo5o_lv7kao" target="_blank" class="channel-sidebar">
     <div class="yt-icon">
