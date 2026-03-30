@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pricing - DashAI</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b0e14;
+  color:#c9d1d9;
+  text-align:center;
+  padding:40px 20px;
+}
+
+h1{
+  margin-bottom:30px;
+}
+
+.container{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:20px;
+}
+
+.card{
+  background:#161b22;
+  padding:25px;
+  border-radius:12px;
+  width:260px;
+  border:1px solid #30363d;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+  border-color:#1f6feb;
+}
+
+.price{
+  font-size:28px;
+  color:white;
+  margin:10px 0;
+}
+
+.tokens{
+  font-size:14px;
+  color:#8b949e;
+}
+
+button{
+  margin-top:15px;
+  width:100%;
+  padding:12px;
+  background:#1f6feb;
+  border:none;
+  border-radius:6px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+.back{
+  margin-top:30px;
+  display:inline-block;
+  color:#1f6feb;
+  cursor:pointer;
+}
+
+.status{
+  margin-top:20px;
+  font-size:13px;
+  color:#8b949e;
+}
+</style>
+</head>
+
+<body>
+
+<h1>💳 Choose Your Plan</h1>
+
+<div class="container">
+
+<!-- BASIC -->
+<div class="card">
+  <h2>Basic</h2>
+  <div class="price">₹199</div>
+  <div class="tokens">200 Tokens</div>
+  <button onclick="buy('BASIC')">Buy Now</button>
+</div>
+
+<!-- PRO -->
+<div class="card">
+  <h2>Pro</h2>
+  <div class="price">₹499</div>
+  <div class="tokens">700 Tokens</div>
+  <button onclick="buy('PRO')">Buy Now</button>
+</div>
+
+<!-- ELITE -->
+<div class="card">
+  <h2>Elite</h2>
+  <div class="price">₹999</div>
+  <div class="tokens">2000 Tokens</div>
+  <button onclick="buy('ENTERPRISE')">Buy Now</button>
+</div>
+
+</div>
+
+<div class="status" id="statusText">
+Secure payment powered by Razorpay 🔒
+</div>
+
+<div class="back" onclick="goBack()">← Back to Dashboard</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec";
+
+let email = "guest_user"; // later replace with real user
+
+async function buy(plan){
+  const status = document.getElementById("statusText");
+  status.innerText = "Creating payment link... ⏳";
+
+  try{
+    const res = await fetch(API_URL,{
+      method:"POST",
+      body: JSON.stringify({
+        action:"createPayment",
+        email:email,
+        plan:plan
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.status === "success"){
+      status.innerText = "Redirecting to payment...";
+
+      // 🔥 redirect to Razorpay
+      window.location.href = data.url;
+
+    } else {
+      status.innerText = "Payment failed ❌";
+    }
+
+  } catch(err){
+    status.innerText = "Server error ❌";
+  }
+}
+
+// 🔙 Back to app
+function goBack(){
+  window.location.href = "app.html";
+}
+</script>
+
+</body>
+</html>
