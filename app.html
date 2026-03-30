@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Dashboard Portal</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box;}
+body{margin:0;font-family:Arial;background:#0b0e14;color:#c9d1d9;}
+
+.container{display:flex;height:100vh;}
+
+.sidebar{
+  width:320px;
+  background:#0d1117;
+  padding:20px;
+  border-right:1px solid #30363d;
+}
+
+.main{
+  flex:1;
+  padding:20px;
+  overflow:auto;
+}
+
+.card{
+  background:#161b22;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+}
+
+h2,h3{margin-top:0;}
+
+input,textarea{
+  width:100%;
+  padding:10px;
+  background:#010409;
+  border:1px solid #30363d;
+  color:white;
+  border-radius:6px;
+  margin-top:8px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  background:#1f6feb;
+  border:none;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
+  font-weight:bold;
+}
+
+button:hover{opacity:0.9;}
+
+.small{
+  font-size:12px;
+  color:#8b949e;
+}
+
+.chart-box{
+  background:#161b22;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LEFT PANEL -->
+<div class="sidebar">
+
+<div class="card">
+<h3>👤 User</h3>
+<p id="userInfo">Loading...</p>
+</div>
+
+<div class="card">
+<h3>📊 Data Source</h3>
+
+<input id="sheetInput" placeholder="Paste Sheet Link or ID">
+
+<p class="small">or</p>
+
+<input type="file" id="csvFile">
+
+<button onclick="useSheet()">Use Sheet</button>
+<button onclick="uploadCSV()">Upload CSV</button>
+
+<p class="small">
+🔒 We do NOT access your Google Drive.  
+Only your provided data is processed.
+</p>
+</div>
+
+<div class="card">
+<h3>🧠 Ask AI</h3>
+
+<textarea id="question" placeholder="Ask something..."></textarea>
+
+<button onclick="askAI()">Run AI (1 Token)</button>
+
+<p id="aiStatus"></p>
+</div>
+
+<div class="card">
+<button onclick="goPricing()">💳 Upgrade Plan</button>
+</div>
+
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="main">
+
+<h2>📈 AI Dashboard</h2>
+
+<div id="charts"></div>
+
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
