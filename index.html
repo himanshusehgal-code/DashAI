@@ -1,186 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DashupData</title>
+<title>DashAI</title>
 
 <style>
-*{box-sizing:border-box;}
-
-:root{
---bg:#0b0e14;
---card:#161b22;
---text:#c9d1d9;
---primary:#1f6feb;
---border:#30363d;
---accent:#238636;
-}
-
-body{
-font-family:Inter,Arial;
-background:var(--bg);
-color:var(--text);
-margin:0;
-padding:40px 20px;
-display:flex;
-justify-content:center;
-}
-
-/* CONTAINER */
-.container{
-max-width:900px;
-width:100%;
-}
-
-/* HERO */
-.hero{
-text-align:center;
-padding:50px 20px;
-background:linear-gradient(180deg,#161b22,#0b0e14);
-border-radius:15px;
-border:1px solid var(--border);
-}
-
-.hero img{
-width:90px;
-margin-bottom:15px;
-filter:drop-shadow(0 0 10px rgba(31,111,235,0.6));
-}
-
-.hero h1{
-color:var(--primary);
-font-size:30px;
-margin:10px 0;
-}
-
-.hero p{
-color:#8b949e;
-line-height:1.6;
-max-width:600px;
-margin:auto;
-}
-
-/* CTA */
-.cta{
-margin-top:25px;
-}
-
-.cta button{
-padding:15px 35px;
-font-size:16px;
-background:var(--primary);
-border:none;
-border-radius:8px;
-color:white;
-cursor:pointer;
-box-shadow:0 6px 20px rgba(31,111,235,0.4);
-}
-
-.cta button:hover{
-transform:translateY(-2px);
-}
-
-/* SECTION */
-.section{
-background:var(--card);
-padding:25px;
-border-radius:12px;
-border:1px solid var(--border);
-margin-top:25px;
-}
-
-.section h2{
-margin-top:0;
-}
-
-/* FEATURES */
-.features{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
-margin-top:15px;
-}
-
-.feature{
-background:#0d1117;
-padding:15px;
-border-radius:10px;
-border:1px solid var(--border);
-}
-
-/* FOOTER */
-footer{
-text-align:center;
-margin-top:30px;
-font-size:12px;
-color:#8b949e;
-}
+body{margin:0;font-family:Arial;background:#0b0e14;color:#c9d1d9;padding:40px;}
+.container{max-width:900px;margin:auto;}
+.hero{text-align:center;padding:50px;background:#161b22;border-radius:12px;}
+.hero h1{color:#1f6feb;}
+.section{margin-top:25px;padding:20px;background:#161b22;border-radius:10px;}
+button{padding:12px 25px;background:#1f6feb;color:white;border:none;border-radius:6px;cursor:pointer;}
+.footer{text-align:center;margin-top:30px;font-size:12px;}
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<!-- HERO -->
 <div class="hero">
-
-<img src="logo.png">
-
+<img src="logo.png" width="80">
 <h1>AI-Powered Data Analyst</h1>
-
-<p>
-Turn your raw data into powerful insights instantly.  
-Ask questions, get charts, and take better decisions — without manual effort.
-</p>
-
-<div class="cta">
-<button onclick="goApp()">🚀 Open Dashboard</button>
+<p>Turn raw data into insights instantly</p>
 </div>
 
-</div>
-
-<!-- WHY -->
 <div class="section">
 <h2>⚡ Why Use DashAI?</h2>
-
-<div class="features">
-<div class="feature">📊 Instant Charts</div>
-<div class="feature">🤖 AI Insights</div>
-<div class="feature">⚡ Zero Manual Work</div>
-<div class="feature">📁 Upload CSV / Sheet</div>
+<p>✔ AI Insights ✔ Charts ✔ CSV Upload ✔ No Login Needed</p>
 </div>
 
-</div>
-
-<!-- HOW -->
 <div class="section">
 <h2>🛠️ How It Works</h2>
-
-<p>1. Upload CSV or paste Sheet link</p>
-<p>2. Ask your question</p>
-<p>3. Get charts + insights instantly</p>
-
+<p>Upload → Ask → Get Results</p>
 </div>
 
-<!-- TRUST -->
-<div class="section">
-<h2>🔒 Your Data is Safe</h2>
-
-<p>
-We do NOT access your Google Drive.  
-We do NOT store your data.  
-Only temporary analysis is performed.
-</p>
-
+<div class="section" style="text-align:center;">
+<button onclick="goApp()">Explore Dashboard →</button>
 </div>
 
-<footer>
-&copy; 2026 DashupData |
+<div class="footer">
 <a href="privacy.html">Privacy</a> |
 <a href="terms.html">Terms</a>
-</footer>
+</div>
 
 </div>
 
