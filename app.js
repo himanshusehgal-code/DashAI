@@ -4,6 +4,7 @@
 const SERVER_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const actionPanelWrapper = document.getElementById('actionPanelWrapper');
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 console.error(err);
                 loginBtn.innerHTML = '🔄 Sync Account';
-                alert('Could not connect to backend server.');
+                alert('Could not connect to backend server. Ensure API is correct.');
             }
         }
     };
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 2. CSV UPLOAD & FREE CHARTS
+    // 2. CSV UPLOAD, PARSING & FREE CHARTS
     // ==========================================
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-900/10'); });
@@ -242,7 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 let chartId = `freeChart_${Date.now()}_${idx}`;
 
                 let wrapper = document.createElement('div');
-                // Added chart-card class for PDF break avoid
                 wrapper.className = 'chart-card bg-[#161b22] p-5 rounded-2xl border border-gray-700/50 flex flex-col shadow-lg relative overflow-hidden';
                 
                 wrapper.innerHTML = `
@@ -380,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
         insights.forEach((item, idx) => {
             let chartId = `aiPremChart_${Date.now()}_${idx}`; 
             let wrapper = document.createElement('div');
-            // Added chart-card class for PDF break avoid
             wrapper.className = 'chart-card bg-gradient-to-b from-[#0d1117] to-[#010409] p-6 rounded-2xl border border-blue-900/50 flex flex-col shadow-2xl relative overflow-hidden transition-all hover:border-blue-700/60';
 
             let tag = `<div class="absolute top-0 right-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-xl shadow-lg">PREMIUM AI</div>`;
@@ -453,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. PDF EXPORT (🔥 FIXED OPTIONS 🔥)
+    // 4. PDF EXPORT (🔥 FIXED: Landscape + Exact Width 🔥)
     // ==========================================
     btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -466,52 +465,58 @@ document.addEventListener('DOMContentLoaded', () => {
         actionPanelWrapper.style.display = 'none'; 
         rawDataSection.style.display = 'none'; 
 
-        try {
-            const res = await fetch(SERVER_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                body: JSON.stringify({ action: 'deductPdfToken', email: email })
-            });
-            const data = await res.json();
-            
-            if(data.status === 'success') {
-                currentTokens -= 1;
-                tokenCount.innerText = currentTokens;
+        // Reset scroll position to top to prevent canvas offset bugs
+        document.getElementById('pdf-export-area').scrollTop = 0; 
+        window.scrollTo(0, 0);
+
+        setTimeout(async () => {
+            try {
+                const res = await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                    body: JSON.stringify({ action: 'deductPdfToken', email: email })
+                });
+                const data = await res.json();
                 
-                const element = document.getElementById('pdf-export-area');
-                
-                // 🔥 NEW FIXED CONFIG FOR HTML2PDF 🔥
-                const opt = {
-                    margin: 10,
-                    filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2, 
-                        useCORS: true,
-                        scrollY: 0, // <--- Corrected
-                        windowWidth: document.body.scrollWidth // <--- Corrected
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait' 
-                    },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                };
-                
-                await html2pdf().set(opt).from(element).save();
-                
-            } else {
-                throw new Error(data.message);
+                if(data.status === 'success') {
+                    currentTokens -= 1;
+                    tokenCount.innerText = currentTokens;
+                    
+                    const element = document.getElementById('pdf-export-area');
+                    
+                    // 🔥 THE FIX: Use Landscape & target element's actual width
+                    const opt = {
+                        margin: [10, 10, 10, 10],
+                        filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { 
+                            scale: 2, 
+                            useCORS: true,
+                            scrollY: 0,
+                            windowWidth: element.scrollWidth // Only capture the dashboard's width
+                        },
+                        jsPDF: { 
+                            unit: 'mm', 
+                            format: 'a4', 
+                            orientation: 'landscape' // Dashboard looks best wide
+                        },
+                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    };
+                    
+                    await html2pdf().set(opt).from(element).save();
+                    
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch(err) {
+                alert('PDF Export Failed: ' + err.message);
+            } finally {
+                actionPanelWrapper.style.display = 'block';
+                rawDataSection.style.display = 'block';
+                btnPDF.innerHTML = originalText;
+                btnPDF.disabled = false;
             }
-        } catch(err) {
-            alert('PDF Export Failed: ' + err.message);
-        } finally {
-            actionPanelWrapper.style.display = 'block';
-            rawDataSection.style.display = 'block';
-            btnPDF.innerHTML = originalText;
-            btnPDF.disabled = false;
-        }
+        }, 150);
     });
 
     document.getElementById('btnClear').addEventListener('click', () => {
