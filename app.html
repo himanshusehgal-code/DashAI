@@ -17,7 +17,6 @@
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
-        /* 🔥 FIX 2: SCROLL BLEED AND HEADER FIXES 🔥 */
         body {
             overflow: hidden;
         }
@@ -28,16 +27,12 @@
             z-index: 1;
         }
 
+        /* Top Header remains sticky, but Action Panel is now normal */
         header {
             position: sticky;
             top: 0;
             z-index: 60;
             background: #0a0a0a;
-        }
-
-        /* 🔥 Solid blur fix so nothing bleeds through 🔥 */
-        #actionPanelWrapper {
-            background: #0a0a0a !important; 
         }
     </style>
 </head>
@@ -89,8 +84,7 @@
                 <input type="file" id="fileInput" class="hidden" accept=".csv">
             </div>
 
-            <div id="actionPanelWrapper" class="sticky top-0 z-[50] -mx-8 -mt-8 pt-8 px-8 pb-4 bg-[#0a0a0a] border-b border-gray-800 shadow-2xl hidden">
-                
+            <div id="actionPanelWrapper" class="hidden mb-8">
                 <div id="actionPanel" class="flex flex-col gap-5 bg-[#0d1117] p-6 rounded-xl border border-gray-700/50 shadow-lg">
                     
                     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -126,7 +120,7 @@
                 </div>
             </div>
 
-            <div id="dashboardContent" class="hidden flex flex-col gap-8 mt-6">
+            <div id="dashboardContent" class="hidden flex flex-col gap-8">
                 
                 <div id="freeSectionWrapper">
                     <h2 class="text-lg font-bold text-gray-300 mb-4 flex items-center"><span class="text-green-500 mr-2">📈</span> Free Instant Overview</h2>
