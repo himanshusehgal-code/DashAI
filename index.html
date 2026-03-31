@@ -1,16 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>DashAI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DashupData</title>
+
 <style>
-body{margin:0;font-family:Arial;background:#0b0e14;color:#c9d1d9;}
-.container{max-width:900px;margin:auto;padding:20px;}
-.section{background:#161b22;padding:25px;margin-top:20px;border-radius:10px;}
-h1{color:#1f6feb;text-align:center;}
-h2{margin-top:0;}
+* { box-sizing: border-box; }
+
+:root {
+--bg:#0b0e14;
+--card:#161b22;
+--text:#c9d1d9;
+--primary:#1f6feb;
+--border:#30363d;
+--warning:#ff9800;
+--danger:#f85149;
+}
+
+/* BODY */
+body{
+font-family:Arial;
+background:var(--bg);
+color:var(--text);
+margin:0;
+}
+
+/* NAVBAR */
+.navbar{
+display:flex;
+justify-content:space-between;
+padding:15px 40px;
+background:#0d1117;
+border-bottom:1px solid var(--border);
+}
+
+.navbar a{
+color:#c9d1d9;
+margin-left:20px;
+text-decoration:none;
+}
+
+.navbar a:hover{color:var(--primary);}
+
+.logo{color:var(--primary);font-weight:bold;}
+
+/* CONTAINER */
+.landing-container{
+max-width:800px;
+margin:auto;
+padding:30px 20px;
+}
+
+/* HERO */
+.landing-hero{
+text-align:center;
+padding:40px;
+background:linear-gradient(180deg,#161b22,#0b0e14);
+border-radius:15px;
+border:1px solid var(--border);
+}
+
+.landing-hero h1{
+color:var(--primary);
+}
+
+.landing-hero p{
+color:#8b949e;
+}
+
+/* SECTIONS */
+.landing-section{
+background:var(--card);
+padding:25px;
+border-radius:12px;
+border:1px solid var(--border);
+margin-top:25px;
+}
+
+.landing-section h2{
+border-bottom:1px solid var(--border);
+padding-bottom:10px;
+}
+
+/* FAQ */
 .faq-item{margin-bottom:15px;}
-.q{color:#ff9800;font-weight:bold;}
+.faq-q{color:var(--warning);font-weight:bold;}
+
+/* FOOTER */
+footer{
+text-align:center;
+margin-top:40px;
+border-top:1px solid var(--border);
+padding-top:20px;
+font-size:12px;
+}
 </style>
 </head>
 
@@ -19,59 +103,81 @@ h2{margin-top:0;}
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="logo">DashAI</div>
-  <div class="nav-links">
+  <div>
     <a href="index.html">Home</a>
     <a href="app.html">Portal</a>
     <a href="pricing.html">Pricing</a>
   </div>
 </div>
 
-<div class="container">
+<div class="landing-container">
 
-<h1>AI-Powered Data Analyst</h1>
-<p style="text-align:center;">Turn your raw data into insights instantly</p>
-
-<div class="section">
-<h2>⚡ Why Use DashAI?</h2>
-<p>✔ Instant Charts ✔ AI Insights ✔ No Manual Work ✔ CSV / Sheet Support</p>
+<!-- HERO -->
+<div class="landing-hero">
+<h1>AI-Powered Data Analyst Dashboard</h1>
+<p>
+Transform raw spreadsheet data into insights.  
+Ask questions → Get charts → Take actions.
+</p>
 </div>
 
-<div class="section">
+<!-- WHY -->
+<div class="landing-section">
+<h2>⚡ Why Use This Dashboard?</h2>
+<p>
+✔ Real-time tracking<br>
+✔ Automated reports<br>
+✔ Zero manual work<br>
+✔ CSV & Sheet support
+</p>
+</div>
+
+<!-- HOW -->
+<div class="landing-section">
 <h2>🛠️ How It Works</h2>
 <p>1. Upload data or paste sheet</p>
 <p>2. Ask your question</p>
-<p>3. Get charts instantly</p>
+<p>3. Get charts + insights</p>
 </div>
 
-<div class="section">
-<h2>🔒 Privacy</h2>
-<p>We do NOT access your Google Drive. Data is not stored.</p>
-</div>
-
-<div class="section">
+<!-- POLICY -->
+<div class="landing-section">
 <h2>📜 Policy</h2>
-<p>No refund policy. Tokens once purchased are final.</p>
+<p>No refund policy. Tokens are final.</p>
 </div>
 
-<div class="section">
+<!-- PRIVACY -->
+<div class="landing-section">
+<h2>🔒 Privacy</h2>
+<p>Your data is not stored. Only processed temporarily.</p>
+</div>
+
+<!-- FAQ -->
+<div class="landing-section">
 <h2>❓ FAQ</h2>
 
 <div class="faq-item">
-<p class="q">Is data safe?</p>
-<p>Yes, we do not store your data.</p>
+<div class="faq-q">Is my data safe?</div>
+<p>Yes, fully secure.</p>
 </div>
 
 <div class="faq-item">
-<p class="q">How to get tokens?</p>
-<p>Go to pricing page and purchase.</p>
+<div class="faq-q">How to get tokens?</div>
+<p>Go to Pricing page.</p>
 </div>
 
 <div class="faq-item">
-<p class="q">Can I upload Excel?</p>
-<p>Yes via CSV upload.</p>
+<div class="faq-q">CSV supported?</div>
+<p>Yes supported.</p>
 </div>
 
 </div>
+
+<footer>
+© 2026 DashAI |
+<a href="privacy.html">Privacy</a> |
+<a href="terms.html">Terms</a>
+</footer>
 
 </div>
 
