@@ -27,12 +27,27 @@
             z-index: 1;
         }
 
-        /* Top Header remains sticky, but Action Panel is now normal */
+        /* 🔥 PERFECT GLASSMORPHISM FIX FOR HEADER 🔥 */
         header {
             position: sticky;
             top: 0;
             z-index: 60;
-            background: #0a0a0a;
+            background: rgba(10, 14, 23, 0.85) !important; /* Semi-transparent */
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+
+        /* 🔥 PERFECT GLASSMORPHISM FIX FOR ACTION PANEL 🔥 */
+        #actionPanelWrapper {
+            position: sticky;
+            top: 5rem; /* 80px - exactly below the h-20 header */
+            z-index: 50;
+            background: rgba(10, 14, 23, 0.85) !important; /* Semi-transparent */
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
     </style>
 </head>
@@ -64,7 +79,7 @@
 
     <main class="flex-1 flex flex-col overflow-hidden relative">
         
-        <header class="h-20 border-b border-gray-800/50 flex justify-between items-center px-8 bg-[#0a0a0a] z-[60] sticky top-0">
+        <header class="h-20 flex justify-between items-center px-8">
             <h1 class="text-xl font-bold text-gray-100 flex items-center"><span class="text-blue-500 mr-2">📊</span> AI Data Analytics</h1>
             <div class="flex items-center space-x-3 bg-[#0d1117] border border-gray-800 px-5 py-2.5 rounded-xl shadow-inner">
                 <div class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></div>
@@ -84,8 +99,9 @@
                 <input type="file" id="fileInput" class="hidden" accept=".csv">
             </div>
 
-            <div id="actionPanelWrapper" class="hidden mb-8">
-                <div id="actionPanel" class="flex flex-col gap-5 bg-[#0d1117] p-6 rounded-xl border border-gray-700/50 shadow-lg">
+            <div id="actionPanelWrapper" class="-mx-8 px-8 py-4 hidden">
+                
+                <div id="actionPanel" class="flex flex-col gap-5 bg-[#0d1117]/80 p-6 rounded-xl border border-gray-700/50 shadow-lg backdrop-blur-md">
                     
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div class="flex gap-4">
@@ -120,7 +136,7 @@
                 </div>
             </div>
 
-            <div id="dashboardContent" class="hidden flex flex-col gap-8">
+            <div id="dashboardContent" class="hidden flex flex-col gap-8 mt-6">
                 
                 <div id="freeSectionWrapper">
                     <h2 class="text-lg font-bold text-gray-300 mb-4 flex items-center"><span class="text-green-500 mr-2">📈</span> Free Instant Overview</h2>
