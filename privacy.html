@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="dark">
 <head>
-  <title>Privacy Policy - DashupData</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - DashAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>Privacy Policy</h1>
-  <p>Your data is secure. The app operates within Google’s secure OAuth2 infrastructure. Your data is only temporarily accessed to generate AI insights and is never stored on our external servers. We do not sell or share your personal information with third parties.</p>
+<body class="bg-[#0a0a0a] text-gray-300 font-sans p-8 md:p-20 selection:bg-blue-500/30">
+    <div class="max-w-3xl mx-auto bg-gray-900/30 p-10 rounded-3xl border border-gray-800">
+        <a href="index.html" class="text-blue-500 hover:text-blue-400 mb-8 inline-flex items-center text-sm font-medium transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Home
+        </a>
+        <h1 class="text-4xl font-extrabold text-white mb-4">Privacy Policy</h1>
+        <p class="mb-10 text-sm text-gray-500">Effective Date: March 31, 2026</p>
+        
+        <div class="space-y-8 text-sm leading-relaxed">
+            <section>
+                <h2 class="text-xl font-semibold text-white mb-3">1. Information We Collect</h2>
+                <p>We collect minimal information necessary to provide the DashAI service. This includes the email address you provide for account syncing and API token management.</p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-white mb-3">2. How We Handle Your Data</h2>
+                <p>When you upload a CSV file to DashAI, the data is parsed locally in your browser. If you request an AI analysis, only a subset of your data is securely transmitted to our backend and subsequently to OpenAI's API to generate insights. <strong>We do not permanently store your uploaded datasets on our servers.</strong></p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-semibold text-white mb-3">3. Third-Party Services</h2>
+                <p>We utilize trusted third-party services to operate our platform:</p>
+                <ul class="list-disc pl-5 mt-2 space-y-2 text-gray-400">
+                    <li><strong>OpenAI:</strong> Used for generating AI analytical insights.</li>
+                    <li><strong>Razorpay:</strong> Used securely for processing payment transactions. We do not store your credit card information.</li>
+                    <li><strong>Google Sheets:</strong> Used internally as a database for managing user token allowances.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
 </body>
 </html>
