@@ -16,6 +16,12 @@
         ::-webkit-scrollbar-track { background: #111827; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+        
+        /* Print styling to ensure charts look good in PDF */
+        @media print {
+            body { background: #0a0a0a !important; -webkit-print-color-adjust: exact; }
+            .glass { border: 1px solid #333 !important; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body class="bg-[#0a0a0a] text-gray-200 flex h-screen overflow-hidden font-sans selection:bg-blue-500/30">
@@ -48,12 +54,13 @@
     </aside>
 
     <main class="flex-1 flex flex-col overflow-hidden relative" id="pdf-export-area">
+        
         <header class="h-20 border-b border-gray-800/50 flex justify-between items-center px-8 bg-[#0a0a0a] z-10">
-            <h1 class="text-lg font-semibold text-gray-200">AI Data Analytics</h1>
+            <h1 class="text-lg font-semibold text-gray-200">Data Analytics</h1>
             <div class="flex items-center space-x-3 bg-gray-900/80 border border-gray-800 px-4 py-2 rounded-xl">
                 <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
                 <span class="text-sm font-medium text-gray-400">Tokens Remaining:</span>
-                <span id="tokenCount" class="text-white font-bold bg-gray-800 px-2 py-0.5 rounded">--</span>
+                <span id="tokenCount" class="text-white font-bold bg-gray-800 px-2 py-0.5 rounded border border-gray-700">--</span>
              </div>
         </header>
 
@@ -68,43 +75,51 @@
                 <input type="file" id="fileInput" class="hidden" accept=".csv">
             </div>
 
-            <div id="actionPanel" class="hidden flex flex-col gap-4 mb-8 bg-gray-900/40 p-5 rounded-xl border border-gray-800/50 backdrop-blur-sm sticky top-0 z-10">
+            <div id="actionPanel" class="hidden flex flex-col gap-4 mb-8 bg-gray-900/40 p-4 rounded-xl border border-gray-800/50 backdrop-blur-sm sticky top-0 z-10">
+                
                 <div class="flex flex-wrap items-center gap-4">
                     <button id="btnAutoAI" class="bg-green-600 hover:bg-green-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-lg shadow-green-500/20 transition-all flex items-center">
                         ⚡ Generate Full Dashboard (-5 Tokens)
                     </button>
-                    <button id="btnPDF" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center">
+                    
+                     <button id="btnPDF" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Download PDF (-1 Token)
+                        Export Report (-1 Token)
                     </button>
+                    
                     <button id="btnClear" class="ml-auto bg-transparent hover:bg-red-500/10 text-red-400 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors">Clear Workspace</button>
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-800/50">
-                    <input type="text" id="aiQuestion" placeholder="Ask a custom question about this dataset..." class="flex-1 bg-black/50 border border-gray-700 rounded-lg p-2.5 text-sm text-gray-300 focus:outline-none focus:border-blue-500">
+                    <input type="text" id="aiQuestion" placeholder="Ask AI Analyst a custom question about your data..." class="flex-1 bg-black/50 border border-gray-700 rounded-lg p-2.5 text-sm text-gray-300 focus:outline-none focus:border-blue-500 transition-colors">
+                    
                     <button id="btnCustomAI" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all flex items-center">
-                        🧠 Get Custom Insight (-1 Token)
+                        🧠 Custom Insight (-1 Token)
                     </button>
                 </div>
+
                 <div id="aiLoader" class="hidden text-sm text-blue-400 font-medium animate-pulse flex items-center mt-2">
-                    <div class="loader mr-3 border-2 border-t-2 border-blue-400 h-4 w-4"></div> Analyzing your data...
+                    <div class="loader mr-3 border-2 border-t-2 border-blue-400 h-4 w-4"></div> Analyzing your data securely...
                 </div>
             </div>
 
-            <div id="dashboardContent" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="lg:col-span-2 glass p-6 rounded-2xl border border-gray-800 flex flex-col max-h-[380px]">
+            <div id="dashboardContent" class="hidden flex flex-col gap-6">
+                
+                <div class="glass p-6 rounded-2xl border border-gray-800 flex flex-col max-h-[300px]">
                     <h3 class="text-base font-semibold text-white mb-4 flex items-center">
                          <div class="w-2 h-2 rounded-full bg-gray-400 mr-2"></div> Raw Data Preview (Sample)
                     </h3>
                     <div class="overflow-auto flex-1 rounded-lg border border-gray-800/50 bg-black/20">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                             <thead id="tableHead" class="bg-gray-800/50 text-gray-400"></thead>
+                             <thead id="tableHead" class="bg-gray-800/80 text-gray-400 sticky top-0"></thead>
                              <tbody id="tableBody" class="divide-y divide-gray-800/50 text-gray-300"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <div id="aiChartsContainer" class="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+                <div id="aiChartsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
+                    </div>
+
             </div>
           </div>
     </main>
