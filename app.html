@@ -16,6 +16,30 @@
         ::-webkit-scrollbar-track { background: #0d1117; }
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        /* 🔥 FIX 2: SCROLL BLEED AND HEADER FIXES 🔥 */
+        body {
+            overflow: hidden;
+        }
+
+        #pdf-export-area {
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 60;
+            background: #0a0a0a;
+        }
+
+        #actionPanelWrapper {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.95); /* solid blur fix */
+        }
     </style>
 </head>
 <body class="bg-[#0a0a0a] text-gray-200 flex h-screen overflow-hidden font-sans selection:bg-blue-500/30">
@@ -46,7 +70,7 @@
 
     <main class="flex-1 flex flex-col overflow-hidden relative">
         
-        <header class="h-20 border-b border-gray-800/50 flex justify-between items-center px-8 bg-[#0a0a0a] z-40 relative">
+        <header class="h-20 border-b border-gray-800/50 flex justify-between items-center px-8 bg-[#0a0a0a] z-[60] sticky top-0">
             <h1 class="text-xl font-bold text-gray-100 flex items-center"><span class="text-blue-500 mr-2">📊</span> AI Data Analytics</h1>
             <div class="flex items-center space-x-3 bg-[#0d1117] border border-gray-800 px-5 py-2.5 rounded-xl shadow-inner">
                 <div class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></div>
@@ -55,7 +79,7 @@
              </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8 pb-24 bg-[#0a0a0a] relative" id="pdf-export-area">
+        <div class="flex-1 p-8 pb-24 bg-[#0a0a0a]" id="pdf-export-area">
             
             <div id="dropZone" class="border-2 border-dashed border-gray-700/60 bg-[#0d1117] rounded-2xl p-20 text-center hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer mb-8 group shadow-lg">
                 <div class="w-20 h-20 bg-[#161b22] border border-gray-800 rounded-full flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform shadow-xl">
@@ -66,9 +90,9 @@
                 <input type="file" id="fileInput" class="hidden" accept=".csv">
             </div>
 
-            <div id="actionPanelWrapper" class="sticky top-0 z-40 -mx-8 px-8 py-4 bg-[#0a0a0a]/70 backdrop-blur-xl border-b border-gray-800/50 shadow-2xl transition-all hidden">
+            <div id="actionPanelWrapper" class="sticky top-0 z-50 -mx-8 px-8 py-4 bg-[#0a0a0a] backdrop-blur-2xl border-b border-gray-800 shadow-2xl hidden">
                 
-                <div id="actionPanel" class="flex flex-col gap-5 bg-[#0d1117]/80 p-6 rounded-xl border border-gray-700/50 shadow-lg">
+                <div id="actionPanel" class="flex flex-col gap-5 bg-[#0d1117] p-6 rounded-xl border border-gray-700/50 shadow-lg">
                     
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div class="flex gap-4">
