@@ -16,7 +16,7 @@
         <a href="app.html" class="text-sm font-medium text-gray-400 hover:text-white transition-colors bg-gray-900 px-4 py-2 rounded-lg border border-gray-800">Go to Dashboard &rarr;</a>
     </nav>
 
-    <main class="flex-1 flex items-center justify-center py-12 px-4">
+    <main class="flex-1 flex flex-col items-center justify-center py-12 px-4">
         <div class="max-w-6xl w-full">
             <div class="text-center mb-16">
                 <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Unlock the Full Power of Data</h1>
@@ -69,13 +69,32 @@
                     </ul>
                     <button class="payBtn w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 text-center py-3.5 rounded-xl font-semibold transition-colors" data-plan="ENTERPRISE">Select Enterprise</button>
                 </div>
-
             </div>
+
+            <div id="developerTestPlan" class="hidden mt-12 max-w-sm mx-auto">
+                <div class="glass p-6 rounded-3xl border border-yellow-500/50 shadow-[0_0_20px_rgba(234,179,8,0.15)] text-center bg-yellow-500/5">
+                    <span class="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Developer Mode</span>
+                    <h3 class="text-lg font-semibold text-yellow-400 mt-4 mb-2">System Integration Test</h3>
+                    <div class="flex justify-center items-baseline mb-6">
+                        <span class="text-4xl font-extrabold text-white">₹1</span>
+                    </div>
+                    <button class="payBtn w-full bg-yellow-600 hover:bg-yellow-500 text-white text-center py-3 rounded-xl font-bold transition-all shadow-lg" data-plan="TEST">Run Payment Test</button>
+                </div>
+            </div>
+
         </div>
     </main>
 
     <script>
         const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
+
+        // 🔥 CHECK EMAIL TO UNHIDE TEST PLAN 🔥
+        document.addEventListener('DOMContentLoaded', () => {
+            const userEmail = sessionStorage.getItem('dashupdata_email');
+            if (userEmail && userEmail.toLowerCase() === 'himanshusehgal320@gmail.com') {
+                document.getElementById('developerTestPlan').classList.remove('hidden');
+            }
+        });
 
         document.querySelectorAll('.payBtn').forEach(button => {
             button.addEventListener('click', async (e) => {
@@ -90,12 +109,10 @@
                 const originalText = btn.innerText;
                 const selectedPlan = btn.getAttribute('data-plan'); 
                 
-                // Prevent duplicate clicks
                 btn.disabled = true;
                 btn.innerText = 'Initializing Secure Payment...';
 
                 try {
-                    // 1. Fetch Order ID from backend (Replaced 'createPayment' with 'createOrder')
                     const res = await fetch(API_BASE_URL, { 
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -110,23 +127,20 @@
         
                     if(data.status === 'success' && data.order_id) {
                         
-                        // 2. Open Razorpay Inline Checkout Modal
                         const options = {
-                            key: data.key, // Backend should return RAZORPAY_KEY_ID
+                            key: data.key, 
                             amount: data.amount,
                             currency: "INR",
                             name: "DashupData",
                             description: `${selectedPlan} Plan Subscription`,
                             order_id: data.order_id,
                             prefill: { email: email },
-                            theme: { color: "#3b82f6" }, // Match tailwind blue-500
+                            theme: { color: selectedPlan === 'TEST' ? "#ca8a04" : "#3b82f6" }, 
                             
-                            // 3. Handle successful payment
                             handler: async function (response) {
                                 btn.innerText = 'Verifying Payment...';
                                 
                                 try {
-                                    // 4. Call verifyPayment API to instantly allocate tokens
                                     const verifyRes = await fetch(API_BASE_URL, {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -134,29 +148,23 @@
                                             action: 'verifyPayment',
                                             email: email,
                                             plan: selectedPlan,
-                                            razorpay_payment_id: response.razorpay_payment_id,
-                                            razorpay_order_id: response.razorpay_order_id,
-                                            razorpay_signature: response.razorpay_signature
+                                            razorpay_payment_id: response.razorpay_payment_id
                                         })
                                     });
                                     
                                     const verifyData = await verifyRes.json();
-                                    
                                     alert(`🎉 Payment successful! Welcome to DashupData ${selectedPlan}.`);
                                     
                                 } catch(verifyErr) {
-                                    // Backup: Webhook will catch it even if this immediate verification fails
                                     console.error("Verification error: ", verifyErr);
                                     alert("Payment successful! Tokens will be allocated shortly by our system.");
                                 }
 
-                                // 5. Refresh tokens and redirect after exactly 1 second
                                 setTimeout(() => {
                                     window.location.href = "app.html";
                                 }, 1000);
                             },
                             
-                            // If user closes the modal without paying
                             modal: {
                                 ondismiss: function() {
                                     btn.disabled = false;
@@ -176,7 +184,6 @@
                         rzp.open();
 
                     } else {
-                        // Fallback support: If backend still issues a standard payment link
                         if(data.url) {
                             window.location.href = data.url; 
                         } else {
