@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pricing - DashAI Pro</title>
+    <title>Pricing - DashupData Plans</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
@@ -12,123 +12,136 @@
 </head>
 <body class="bg-[#0a0a0a] text-white font-sans antialiased min-h-screen flex flex-col">
     <nav class="p-6 max-w-7xl mx-auto w-full flex justify-between items-center">
-        <a href="index.html" class="text-2xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">DashAI.</a>
+        <a href="index.html" class="text-2xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">DashupData.</a>
         <a href="app.html" class="text-sm font-medium text-gray-400 hover:text-white transition-colors bg-gray-900 px-4 py-2 rounded-lg border border-gray-800">Go to Dashboard &rarr;</a>
     </nav>
 
     <main class="flex-1 flex items-center justify-center py-12 px-4">
-        <div class="max-w-5xl w-full">
+        <div class="max-w-6xl w-full">
             <div class="text-center mb-16">
                 <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Unlock the Full Power of Data</h1>
-                <p class="text-gray-400 text-lg">One simple plan. No hidden fees. Cancel anytime.</p>
+                <p class="text-gray-400 text-lg">Choose the perfect plan for your token needs.</p>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-center">
-                <div class="glass p-10 rounded-3xl border border-gray-800">
-                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Starter</h3>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
+                
+                <div class="glass p-8 rounded-3xl border border-gray-800">
+                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Basic</h3>
                     <div class="flex items-baseline mb-8">
-                        <span class="text-5xl font-extrabold">₹0</span>
-                        <span class="text-gray-500 ml-2">/ forever</span>
+                        <span class="text-5xl font-extrabold">₹199</span>
+                        <span class="text-gray-500 ml-2">/ month</span>
                     </div>
                     <ul class="space-y-4 mb-10 text-gray-400 text-sm">
-                        <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 5 AI Insight Tokens</li>
+                        <li class="flex items-center text-white"><svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 200 AI Tokens</li>
                         <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Basic Chart Visualizations</li>
                         <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> PDF Report Export</li>
-                        <li class="flex items-center opacity-40"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Priority Processing</li>
                     </ul>
-                    <a href="app.html" class="block w-full bg-gray-900 hover:bg-gray-800 border border-gray-700 text-center py-3.5 rounded-xl font-semibold transition-colors">Current Plan</a>
+                    <button class="payBtn w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 text-center py-3.5 rounded-xl font-semibold transition-colors" data-plan="BASIC">Select Basic</button>
                 </div>
 
-                <div class="bg-gradient-to-b from-blue-900/40 to-gray-900 p-10 rounded-3xl border border-blue-500/50 relative shadow-2xl shadow-blue-500/10 transform md:-translate-y-4">
+                <div class="bg-gradient-to-b from-blue-900/40 to-gray-900 p-8 rounded-3xl border border-blue-500/50 relative shadow-2xl shadow-blue-500/10 transform md:-translate-y-4">
                     <div class="absolute top-0 right-8 transform -translate-y-1/2">
                         <span class="bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide shadow-lg">Most Popular</span>
                     </div>
-                    <h3 class="text-xl font-semibold text-blue-400 mb-2">Professional</h3>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-2">Pro</h3>
                     <div class="flex items-baseline mb-8">
                         <span class="text-5xl font-extrabold text-white">₹499</span>
                         <span class="text-gray-400 ml-2">/ month</span>
                     </div>
                     <ul class="space-y-4 mb-10 text-gray-300 text-sm">
-                        <li class="flex items-center text-white font-medium"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited AI Tokens</li>
-                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Advanced Data Visualizations</li>
-                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> White-label PDF Exports</li>
-                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Priority Server Processing</li>
+                        <li class="flex items-center text-white font-medium"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 700 AI Tokens</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Advanced Visualizations</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Priority Support</li>
                     </ul>
-                    <button id="payBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-center py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/25 flex justify-center items-center">
-                        <span id="payBtnText">Upgrade Now</span>
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </button>
-                    <p class="text-xs text-center text-gray-500 mt-4">Secured by Razorpay. Auto-renews monthly.</p>
+                    <button class="payBtn w-full bg-blue-600 hover:bg-blue-500 text-white text-center py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/25" data-plan="PRO">Select Pro</button>
                 </div>
+
+                <div class="glass p-8 rounded-3xl border border-gray-800">
+                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Enterprise</h3>
+                    <div class="flex items-baseline mb-8">
+                        <span class="text-5xl font-extrabold">₹999</span>
+                        <span class="text-gray-500 ml-2">/ month</span>
+                    </div>
+                    <ul class="space-y-4 mb-10 text-gray-400 text-sm">
+                        <li class="flex items-center text-white"><svg class="w-5 h-5 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 2000 AI Tokens</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> White-label Exports</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Dedicated Server Priority</li>
+                    </ul>
+                    <button class="payBtn w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 text-center py-3.5 rounded-xl font-semibold transition-colors" data-plan="ENTERPRISE">Select Enterprise</button>
+                </div>
+
             </div>
         </div>
     </main>
 
     <script>
-        // 🚨 CONFIGURATION 🚨 Same as app.js
-        const API_BASE_URL = 'https://dashai-backend.onrender.com'; // Update to your backend URL
-        const RAZORPAY_KEY_ID = 'aaaa'; // 🚨 Replace with your actual Razorpay Key ID
+        const API_BASE_URL = 'https://dashai-backend.onrender.com'; // Update to backend
+        const RAZORPAY_KEY_ID = 'aaaa'; // Replace with Razorpay Key ID
 
-        document.getElementById('payBtn').addEventListener('click', async () => {
-            const email = sessionStorage.getItem('dashai_email');
-            if(!email) {
-                alert('🔒 Please go to the Dashboard and connect your email account first before upgrading.');
-                window.location.href = 'app.html';
-                return;
-            }
-            
-            const btn = document.getElementById('payBtn');
-            const btnText = document.getElementById('payBtnText');
-            btn.disabled = true;
-            btnText.innerText = 'Initializing...';
-
-            try {
-                // 1. Create order on your backend
-                const res = await fetch(`${API_BASE_URL}/api/create-order`, { method: 'POST' });
-                if(!res.ok) throw new Error('Failed to create order on server');
-                const order = await res.json();
+        document.querySelectorAll('.payBtn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const email = sessionStorage.getItem('dashupdata_email');
+                if(!email) {
+                    alert('🔒 Please go to the Dashboard and connect your email account first before upgrading.');
+                    window.location.href = 'app.html';
+                    return;
+                }
                 
-                // 2. Open Razorpay Checkout Modal
-                const options = {
-                    key: RAZORPAY_KEY_ID, 
-                    amount: order.amount,
-                    currency: order.currency,
-                    name: "DashAI Platform",
-                    description: "Pro Plan Subscription (1 Month)",
-                    image: "https://your-logo-url.png", // Optional
-                    order_id: order.id,
-                    prefill: { email: email },
-                    theme: { color: "#2563eb" },
-                    handler: function (response) {
-                        // Payment Success! The backend Webhook will catch this and update Google Sheets.
-                        // We alert the user and redirect.
-                        alert("🎉 Payment successful! Welcome to DashAI Pro. Your account will be upgraded momentarily.");
-                        window.location.href = "app.html";
-                    },
-                    modal: {
-                        ondismiss: function() {
-                            btn.disabled = false;
-                            btnText.innerText = 'Upgrade Now';
+                const btn = e.target;
+                const originalText = btn.innerText;
+                const selectedPlan = btn.getAttribute('data-plan'); // BASIC, PRO, or ENTERPRISE
+                
+                btn.disabled = true;
+                btn.innerText = 'Initializing...';
+
+                try {
+                    // Send the selected plan to backend to determine amount and token allocation
+                    const res = await fetch(`${API_BASE_URL}/api/create-order`, { 
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email, plan: selectedPlan })
+                    });
+                    
+                    if(!res.ok) throw new Error('Failed to create order on server');
+                    const order = await res.json();
+        
+                    const options = {
+                        key: RAZORPAY_KEY_ID, 
+                        amount: order.amount,
+                        currency: order.currency,
+                        name: "DashupData Platform",
+                        description: `${selectedPlan} Plan Subscription`,
+                        image: "https://your-logo-url.png", 
+                        order_id: order.id,
+                        prefill: { email: email },
+                        theme: { color: "#2563eb" },
+                        handler: function (response) {
+                            alert(`🎉 Payment successful! Welcome to DashupData ${selectedPlan}. Your account has been credited tokens.`);
+                            window.location.href = "app.html";
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                btn.disabled = false;
+                                btn.innerText = originalText;
+                            }
                         }
-                    }
-                };
-                
-                const rzp1 = new Razorpay(options);
-                
-                rzp1.on('payment.failed', function (response){
-                    alert(`Payment Failed: ${response.error.description}`);
-                    btn.disabled = false;
-                    btnText.innerText = 'Upgrade Now';
-                });
-                
-                rzp1.open();
+                    };
+                    const rzp1 = new Razorpay(options);
+                    
+                    rzp1.on('payment.failed', function (response){
+                        alert(`Payment Failed: ${response.error.description}`);
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    });
+                    rzp1.open();
 
-            } catch (err) {
-                console.error(err);
-                alert('⚠️ Payment initialization failed. Please check your connection or backend server.');
-                btn.disabled = false;
-                btnText.innerText = 'Upgrade Now';
-            }
+                } catch (err) {
+                    console.error(err);
+                    alert('⚠️ Payment initialization failed. Please check your connection or backend server.');
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            });
         });
     </script>
 </body>
