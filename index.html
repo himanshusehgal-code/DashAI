@@ -1,185 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DashupData</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DashupData</title>
+  <meta name="google-site-verification" content="ctdrbyIEuJuyCISB05ipRrxK-0MKuoDdvXPlbu-aZY8" />
+  <style>
+    * { box-sizing: border-box; } 
+    :root { 
+        --bg: #0b0e14; 
+        --card: #161b22; 
+        --text: #c9d1d9; 
+        --primary: #1f6feb; 
+        --accent: #238636; 
+        --border: #30363d; 
+        --warning: #ff9800; 
+        --danger: #f85149; 
+        --yt-red: #FF0000;
+    }
+    
+    body { 
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+        background: var(--bg); 
+        color: var(--text); 
+        margin: 0; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        padding: 40px 20px; 
+    }
+    
+    /* YouTube Channel Link - Right Side */
+    .channel-sidebar {
+        position: fixed;
+        right: 20px;
+        top: 40px;
+        z-index: 100;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 10px 15px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        transition: 0.3s;
+    }
+    .channel-sidebar:hover {
+        transform: translateX(-5px);
+        border-color: var(--yt-red);
+    }
+    .yt-icon {
+        width: 24px;
+        height: 24px;
+        background: var(--yt-red);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-<style>
-* { box-sizing: border-box; }
+    .landing-container { max-width: 800px; width: 100%; padding-bottom: 50px; }
+    
+    .landing-hero { text-align: center; margin-bottom: 40px; padding: 40px 20px; background: linear-gradient(180deg, #161b22 0%, #0b0e14 100%); border-radius: 15px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+    .landing-hero h1 { color: var(--primary); margin-top: 0; font-size: 28px; }
+    .landing-hero p { color: #8b949e; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
+    
+    .landing-section { background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; }
+    .landing-section h2 { color: white; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; font-size: 18px; }
+    .landing-section h3 { color: var(--text); font-size: 16px; margin-top: 20px; margin-bottom: 10px; }
+    .landing-section p, .landing-section li { color: #8b949e; font-size: 14px; line-height: 1.6; }
+    .landing-section ul { padding-left: 20px; }
+    .landing-section li { margin-bottom: 10px; }
+    .landing-section b { color: #c9d1d9; }
 
-:root {
---bg:#0b0e14;
---card:#161b22;
---text:#c9d1d9;
---primary:#1f6feb;
---border:#30363d;
---warning:#ff9800;
---danger:#f85149;
+    /* Video Embed Styling */
+    .video-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        height: 0;
+        margin: 20px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .short-container {
+        max-width: 315px;
+        margin: 20px auto;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .faq-item { margin-bottom: 20px; border-bottom: 1px dashed var(--border); padding-bottom: 15px; }
+    .faq-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .faq-q { font-weight: bold; color: var(--warning); margin-bottom: 6px; font-size: 15px; }
+    .faq-a { color: #8b949e; font-size: 14px; line-height: 1.6; margin: 0; }
+
+    .policy-box { background: rgba(248, 81, 73, 0.1); border-left: 4px solid var(--danger); padding: 15px; border-radius: 4px; margin-top: 15px; }
+    .policy-box p { color: #c9d1d9; margin: 0; }
+
+    .cta-container { text-align: center; margin: 30px 0; }
+    
+    a.main-btn { display: inline-block; background: var(--primary); color: white; padding: 15px 40px; font-size: 16px; font-weight: bold; border-radius: 6px; text-decoration: none; transition: 0.2s; box-shadow: 0 4px 15px rgba(31, 111, 235, 0.4); }
+    a.main-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+    a.btn-green { background: var(--accent); box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4); }
+
+    footer { text-align: center; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; color: #8b949e; font-size: 12px; }
+
+    @media (max-width: 1000px) {
+        .channel-sidebar {
+            position: relative;
+            right: auto;
+            top: auto;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+    }
+    .hero-logo {
+  width: 90px;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 0 10px rgba(31,111,235,0.6));
+}
+    <style>
+section {
+  padding: 60px 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
 }
 
-/* BODY */
-body{
-font-family:Arial;
-background:var(--bg);
-color:var(--text);
-margin:0;
+h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
 }
 
-/* NAVBAR */
-.navbar{
-display:flex;
-justify-content:space-between;
-padding:15px 40px;
-background:#0d1117;
-border-bottom:1px solid var(--border);
+.trust-container, .use-container {
+  display: flex;
+  justify-content: center;
 }
 
-.navbar a{
-color:#c9d1d9;
-margin-left:20px;
-text-decoration:none;
+.trust-card, .use-card {
+  background: #111;
+  color: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  text-align: left;
+  line-height: 1.8;
+  font-size: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transition: 0.3s;
 }
 
-.navbar a:hover{color:var(--primary);}
-
-.logo{color:var(--primary);font-weight:bold;}
-
-/* CONTAINER */
-.landing-container{
-max-width:800px;
-margin:auto;
-padding:30px 20px;
+.trust-card:hover, .use-card:hover {
+  transform: translateY(-5px);
 }
 
-/* HERO */
-.landing-hero{
-text-align:center;
-padding:40px;
-background:linear-gradient(180deg,#161b22,#0b0e14);
-border-radius:15px;
-border:1px solid var(--border);
+#maintenance-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0b0e14;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
 }
 
-.landing-hero h1{
-color:var(--primary);
+.maintenance-box {
+  text-align: center;
+  background: #161b22;
+  padding: 40px 50px;
+  border-radius: 12px;
+  border: 1px solid #30363d;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
 
-.landing-hero p{
-color:#8b949e;
+.maintenance-box h1 {
+  color: #f85149;
+  margin-bottom: 15px;
 }
 
-/* SECTIONS */
-.landing-section{
-background:var(--card);
-padding:25px;
-border-radius:12px;
-border:1px solid var(--border);
-margin-top:25px;
+.maintenance-box p {
+  color: #8b949e;
+  font-size: 14px;
 }
-
-.landing-section h2{
-border-bottom:1px solid var(--border);
-padding-bottom:10px;
-}
-
-/* FAQ */
-.faq-item{margin-bottom:15px;}
-.faq-q{color:var(--warning);font-weight:bold;}
-
-/* FOOTER */
-footer{
-text-align:center;
-margin-top:40px;
-border-top:1px solid var(--border);
-padding-top:20px;
-font-size:12px;
-}
-</style>
+  </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-  <div class="logo">DashAI</div>
-  <div>
-    <a href="index.html">Home</a>
-    <a href="app.html">Portal</a>
-    <a href="pricing.html">Pricing</a>
+<!-- MAINTENANCE OVERLAY -->
+<div id="maintenance-screen">
+  <div class="maintenance-box">
+    <h1>🚧 Website Under Maintenance</h1>
+    <p>We are upgrading the system for a better experience.<br>Please check back later.</p>
   </div>
 </div>
 
-<div class="landing-container">
+  <a href="https://youtube.com/@sheetbossbyshegal?si=ryjAIwo5o_lv7kao" target="_blank" class="channel-sidebar">
+    <div class="yt-icon">
+        <svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </div>
+    Sheet Boss By Sehgal
+  </a>
 
-<!-- HERO -->
-<div class="landing-hero">
-<h1>AI-Powered Data Analyst Dashboard</h1>
-<p>
-Transform raw spreadsheet data into insights.  
-Ask questions → Get charts → Take actions.
-</p>
-</div>
+  <div class="landing-container">
+    
+    <div class="landing-hero">
+    <img src="logo.png" class="hero-logo" alt="DashAI Logo">
+      <h1>AI-Powered Data Analyst Dashboard</h1>
+      <p>Transform raw spreadsheet data into meaningful business strategies. Simply "ask" your data questions in plain English. Our AI analyzes trends, generates visual charts, and provides actionable steps to improve your business performance.</p>
+      
+     <!-- ===== WHY USE SECTION ===== -->
+<section class="use-section">
+  <h2>⚡ Why Use This Dashboard?</h2>
 
-<!-- WHY -->
-<div class="landing-section">
-<h2>⚡ Why Use This Dashboard?</h2>
-<p>
-✔ Real-time tracking<br>
-✔ Automated reports<br>
-✔ Zero manual work<br>
-✔ CSV & Sheet support
-</p>
-</div>
+  <div class="use-container">
+    <div class="use-card">
+      ✔ Real-time Data Tracking<br>
+      ✔ Automated Reports<br>
+      ✔ Zero Manual Work<br>
+      ✔ Works directly with Google Sheets<br>
+      ✔ Supports Data Upload (Excel, CSV, etc.)<br>
+      Note: Payment Mode is Under Review You May Use your 5 Token of Free Trial.<br>
+    </div>
+  </div>
+</section>
+      
+      <a href="https://script.google.com/macros/s/AKfycbxn0oBfm5p24TjUX1Ixbid6xwUWPZieg1JZRopvpMO9E4poQfzGg4oLO3t0iIFU0tGM/exec" class="main-btn">🔌 Connect & Authorize Now</a>
+    </div>
 
-<!-- HOW -->
-<div class="landing-section">
-<h2>🛠️ How It Works</h2>
-<p>1. Upload data or paste sheet</p>
-<p>2. Ask your question</p>
-<p>3. Get charts + insights</p>
-</div>
+    <div class="landing-section">
+      <h2>🛠️ How It Works (Step-by-Step)</h2>
+      <ul>
+        <li><b>Authentication & Onboarding:</b> Log in via your Google Account. New users get 5 Free Trial Tokens.</li>
+        <li><b>Data Integration:</b> Link spreadsheets directly from your Google Drive or upload local CSV files securely.</li>
+        <li><b>The "AI Insight" Engine:</b> Type a question (e.g., "Which region is underperforming?"). The backend securely analyzes a summary of your data.</li>
+        <li><b>Visual Output:</b> Get a live chart and a three-part breakdown: The Issue, The Insight, and The Action.</li>
+        <li><b>Token System & Pricing:</b> 1 query = 1 Token. Top up instantly using our Razorpay secure gateway. Tokens are priced dynamically inside the dashboard based on your usage tier.</li>
+      </ul>
 
-<!-- POLICY -->
-<div class="landing-section">
-<h2>📜 Policy</h2>
-<p>No refund policy. Tokens are final.</p>
-</div>
+      <h3>Video Guide: Full Working Tutorial & Permissions</h3>
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/l0Oj0F-1oYc" title="Working Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </div>
 
-<!-- PRIVACY -->
-<div class="landing-section">
-<h2>🔒 Privacy</h2>
-<p>Your data is not stored. Only processed temporarily.</p>
-</div>
+    <div class="landing-section">
+      <h2>📜 Legal & Policies</h2>
+      
+      <h3>Cancellation & Refund Policy</h3>
+      <div class="policy-box">
+        <p><b>Strict No-Refund Policy:</b> All token purchases are final and non-refundable. However, if due to a technical issue your payment is deducted but tokens are not added to your account, please do not worry. <br><br>
+        Kindly share your <b>UTR number or a payment screenshot</b> with us at <b>himanshusehgal320@gmail.com</b> or WhatsApp us at <b>8569890156</b>. Our team will verify the transaction and manually credit the tokens to your account within 24-48 hours.</p>
+      </div>
 
-<!-- FAQ -->
-<div class="landing-section">
-<h2>❓ FAQ</h2>
+      <h3>Tutorial: How to Make a Payment</h3>
+      <div class="short-container">
+        <iframe width="315" height="560" src="https://www.youtube.com/embed/YVDoap37vE4" title="Payment Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
 
-<div class="faq-item">
-<div class="faq-q">Is my data safe?</div>
-<p>Yes, fully secure.</p>
-</div>
+      <h3 id="terms">Terms & Conditions</h3>
+      <p>By using our service, you agree to our terms. Users are responsible for the data they connect. We do not claim ownership over your data. Accounts attempting to misuse the token system or API limits will be suspended.</p>
 
-<div class="faq-item">
-<div class="faq-q">How to get tokens?</div>
-<p>Go to Pricing page.</p>
-</div>
+      <h3 id="privacy">Privacy Policy</h3>
+      <p>Your data is secure. The app operates within Google’s secure OAuth2 infrastructure. Your data is only temporarily accessed to generate AI insights and is <b>never stored</b> on our external servers. We do not sell or share your personal information with third parties.</p>
 
-<div class="faq-item">
-<div class="faq-q">CSV supported?</div>
-<p>Yes supported.</p>
-</div>
+      <h3>Contact Us</h3>
+      <p>
+        <b>AI-Powered Data Analyst Dashboard</b><br>
+        <b>Email:</b> himanshusehgal320@gmail.com<br>
+        <b>Phone / WhatsApp:</b> 8569890156<br>
+        <b>Operating Address:</b> Kalka, Haryana, 133302
+      </p>
+    </div>
 
-</div>
+    <div class="landing-section">
+      <h2>❓ Frequently Asked Questions (FAQ)</h2>
+      
+      <div class="faq-item">
+        <div class="faq-q">Q1: Is my data secure?</div>
+        <p class="faq-a">Absolutely. The app operates within Google’s secure OAuth2 infrastructure. Your data is only accessed to generate insights and is never stored on external servers.</p>
+      </div>
 
-<footer>
-© 2026 DashAI |
-<a href="privacy.html">Privacy</a> |
-<a href="terms.html">Terms</a>
+      <div class="faq-item">
+        <div class="faq-q">Q2: I see a "ScriptError: Authorization is required" or the app is stuck. What should I do?</div>
+        <p class="faq-a">This usually happens when there is a conflict with old permissions. Follow these steps:<br>
+        1. Go to your <a href="https://myaccount.google.com/connections" target="_blank" style="color: var(--primary); text-decoration: underline;">Google Account Permissions</a>.<br>
+        2. Find "AI SaaS Dashboard" (or your Project Name) and click Remove Access.<br>
+        3. Come back to the Web App and Reload (Refresh) the page.<br>
+        4. The app will ask for permissions again. Click "Allow" and it will start working perfectly.</p>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Q3: How do I get more tokens?</div>
+        <p class="faq-a">Click on the "Upgrade" button in your dashboard. We use Razorpay for secure payments. Once successful, your balance updates automatically within seconds.</p>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Q4: Can I use this for my offline Excel files?</div>
+        <p class="faq-a">Yes! Use the "Upload CSV" button. The system automatically converts your file into a Google Sheet so the AI engine can analyze it.</p>
+      </div>
+    </div>
+
+    <div class="cta-container">
+      <a href="https://script.google.com/macros/s/AKfycbxn0oBfm5p24TjUX1Ixbid6xwUWPZieg1JZRopvpMO9E4poQfzGg4oLO3t0iIFU0tGM/exec" class="main-btn btn-green">🚀 Get Started Now</a>
+    </div>
+
+   <footer>
+  &copy; 2026 DashupData |
+  <a href="/privacy.html">Privacy Policy</a> |
+  <a href="/terms.html">Terms & Conditions</a>
 </footer>
 
-</div>
+  </div>
 
 </body>
 </html>
