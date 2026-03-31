@@ -73,8 +73,8 @@
             </div>
         </div>
     </main>
-<script>
-        // 🚨 UPDATE: Apna Google Apps Script Web App URL yahan daalein
+
+    <script>
         const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
 
         document.querySelectorAll('.payBtn').forEach(button => {
@@ -88,18 +88,19 @@
                 
                 const btn = e.target;
                 const originalText = btn.innerText;
-                const selectedPlan = btn.getAttribute('data-plan'); // BASIC, PRO, ENTERPRISE, or TEST
+                const selectedPlan = btn.getAttribute('data-plan'); 
                 
+                // Prevent duplicate clicks
                 btn.disabled = true;
-                btn.innerText = 'Generating Payment Link...';
+                btn.innerText = 'Initializing Secure Payment...';
 
                 try {
-                    // Send request to GAS backend to generate Razorpay link
+                    // 1. Fetch Order ID from backend (Replaced 'createPayment' with 'createOrder')
                     const res = await fetch(API_BASE_URL, { 
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ 
-                            action: 'createPayment', 
+                            action: 'createOrder', 
                             email: email, 
                             plan: selectedPlan 
                         })
@@ -107,11 +108,80 @@
                     
                     const data = await res.json();
         
-                    if(data.status === 'success' && data.url) {
-                        // User ko directly Razorpay ke secured page par bhej dein
-                        window.location.href = data.url; 
+                    if(data.status === 'success' && data.order_id) {
+                        
+                        // 2. Open Razorpay Inline Checkout Modal
+                        const options = {
+                            key: data.key, // Backend should return RAZORPAY_KEY_ID
+                            amount: data.amount,
+                            currency: "INR",
+                            name: "DashupData",
+                            description: `${selectedPlan} Plan Subscription`,
+                            order_id: data.order_id,
+                            prefill: { email: email },
+                            theme: { color: "#3b82f6" }, // Match tailwind blue-500
+                            
+                            // 3. Handle successful payment
+                            handler: async function (response) {
+                                btn.innerText = 'Verifying Payment...';
+                                
+                                try {
+                                    // 4. Call verifyPayment API to instantly allocate tokens
+                                    const verifyRes = await fetch(API_BASE_URL, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                        body: JSON.stringify({
+                                            action: 'verifyPayment',
+                                            email: email,
+                                            plan: selectedPlan,
+                                            razorpay_payment_id: response.razorpay_payment_id,
+                                            razorpay_order_id: response.razorpay_order_id,
+                                            razorpay_signature: response.razorpay_signature
+                                        })
+                                    });
+                                    
+                                    const verifyData = await verifyRes.json();
+                                    
+                                    alert(`🎉 Payment successful! Welcome to DashupData ${selectedPlan}.`);
+                                    
+                                } catch(verifyErr) {
+                                    // Backup: Webhook will catch it even if this immediate verification fails
+                                    console.error("Verification error: ", verifyErr);
+                                    alert("Payment successful! Tokens will be allocated shortly by our system.");
+                                }
+
+                                // 5. Refresh tokens and redirect after exactly 1 second
+                                setTimeout(() => {
+                                    window.location.href = "app.html";
+                                }, 1000);
+                            },
+                            
+                            // If user closes the modal without paying
+                            modal: {
+                                ondismiss: function() {
+                                    btn.disabled = false;
+                                    btn.innerText = originalText;
+                                }
+                            }
+                        };
+                        
+                        const rzp = new Razorpay(options);
+                        
+                        rzp.on('payment.failed', function (response){
+                            alert(`Payment Failed: ${response.error.description}`);
+                            btn.disabled = false;
+                            btn.innerText = originalText;
+                        });
+                        
+                        rzp.open();
+
                     } else {
-                        throw new Error(data.message || 'Failed to create payment link.');
+                        // Fallback support: If backend still issues a standard payment link
+                        if(data.url) {
+                            window.location.href = data.url; 
+                        } else {
+                            throw new Error(data.message || 'Failed to generate order.');
+                        }
                     }
 
                 } catch (err) {
@@ -123,7 +193,5 @@
             });
         });
     </script>
-</body>
-</html>
 </body>
 </html>
