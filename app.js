@@ -1,6 +1,6 @@
 // app.js
 
-// 🚨 UPDATE TO YOUR GOOGLE SCRIPT WEB APP URL 🚨
+// 🚨 UPDATE THIS URL TO YOUR DEPLOYED GOOGLE APPS SCRIPT URL 🚨
 const SERVER_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,12 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
     const actionPanel = document.getElementById('actionPanel');
     const dashboardContent = document.getElementById('dashboardContent');
+    
     const tableHead = document.getElementById('tableHead');
     const tableBody = document.getElementById('tableBody');
     const aiChartsContainer = document.getElementById('aiChartsContainer');
     
     const btnAutoAI = document.getElementById('btnAutoAI');
     const btnCustomAI = document.getElementById('btnCustomAI');
+    const btnPDF = document.getElementById('btnPDF');
     const aiQuestion = document.getElementById('aiQuestion');
     const aiLoader = document.getElementById('aiLoader');
     
@@ -24,20 +26,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const authStatus = document.getElementById('authStatus');
     
     let allCharts = [];
-    let currentDataSummary = ""; // Data sent to AI
+    let currentDataSummary = ""; 
     let currentTokens = 0;
 
-    // --- Authentication ---
+    // ==========================================
+    // 1. AUTHENTICATION & SYNC
+    // ==========================================
     const loadUser = async () => {
         const email = sessionStorage.getItem('dashupdata_email');
         if (email) {
             userEmailInput.value = email;
             try {
                 loginBtn.innerText = 'Syncing...';
+                
                 const res = await fetch(SERVER_URL, {
                     method: 'POST',
+                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
                     body: JSON.stringify({ action: 'getUserInfo', email: email })
                 });
+                
                 const data = await res.json();
 
                 if(data.status === 'success') {
@@ -54,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) {
                 console.error('Failed to sync user data', err);
-                loginBtn.innerText = 'Register Email';
-                alert('Could not connect to database.');
+                loginBtn.innerText = 'Sync Account';
+                alert('Could not connect to backend server.');
             }
         }
     };
@@ -72,12 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- File Upload & CSV Parsing ---
+    // ==========================================
+    // 2. CSV UPLOAD & PARSING
+    // ==========================================
     dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500'));
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-500/10'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500', 'bg-blue-500/10'));
     dropZone.addEventListener('drop', (e) => {
-        e.preventDefault(); dropZone.classList.remove('border-blue-500');
+        e.preventDefault(); dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
         if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
     });
     fileInput.addEventListener('change', (e) => {
@@ -86,14 +95,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const handleFile = (file) => {
         if(!file.name.endsWith('.csv')) return alert('Please upload a valid CSV file.');
+        
         Papa.parse(file, {
-            header: true, skipEmptyLines: true,
-            preview: 50, // Grab only 50 rows for the AI
+            header: true, skipEmptyLines: true, preview: 50,
             complete: (results) => {
-                if(results.data.length > 0) {
+                if(results.data && results.data.length > 0) {
                     currentDataSummary = Papa.unparse(results.data);
                     renderDataPreview(results.data);
-                } else alert('CSV file is empty or invalid.');
+                } else {
+                    alert('CSV file is empty or invalid.');
+                }
             }
         });
     };
@@ -110,12 +121,16 @@ document.addEventListener('DOMContentLoaded', () => {
         ).join('');
     };
 
-    // --- AI Execution Core ---
-    async function triggerAI(question, modeType, cost) {
+    // ==========================================
+    // 3. AI INTEGRATION LOGIC
+    // ==========================================
+    async function executeAI(question, mode, cost) {
         const email = sessionStorage.getItem('dashupdata_email');
-        if (!email) return alert('🔒 Please sync your email account on the left sidebar first.');
+        if (!email) return alert('🔒 Please Sync your Account in the sidebar first.');
+        if (!currentDataSummary) return alert('Please upload data first.');
+        
         if (currentTokens < cost) {
-            alert(`❌ Insufficient tokens. You need ${cost} tokens for this action.`);
+            alert(`❌ Insufficient tokens. You need ${cost} tokens.`);
             window.location.href = 'pricing.html';
             return;
         }
@@ -125,28 +140,23 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCustomAI.disabled = true;
 
         try {
-            const response = await fetch(SERVER_URL, {
+            const res = await fetch(SERVER_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                body: JSON.stringify({ 
-                    action: 'runInsight', 
-                    email: email, 
-                    question: question, 
-                    dataSummary: currentDataSummary,
-                    mode: modeType
-                })
+                body: JSON.stringify({ action: 'runInsight', email: email, question: question, dataSummary: currentDataSummary, mode: mode })
             });
             
-            const result = await response.json();
+            const result = await res.json();
             
             if (result.status === 'success') {
                 currentTokens -= result.tokensDeducted;
                 tokenCount.innerText = currentTokens;
-                renderCharts(result.insights, modeType === 'auto');
+                renderAICharts(result.insights, mode === 'auto');
             } else {
                 alert(`Error: ${result.message}`);
             }
         } catch (err) {
+            console.error(err);
             alert('⚠️ Network error. Connection failed.');
         } finally {
             aiLoader.classList.add('hidden');
@@ -155,17 +165,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Button Listeners ---
-    btnAutoAI.addEventListener('click', () => triggerAI("Generate a complete dashboard", "auto", 5));
-    
+    btnAutoAI.addEventListener('click', () => executeAI("Generate complete dashboard insights", "auto", 5));
     btnCustomAI.addEventListener('click', () => {
         const q = aiQuestion.value.trim();
-        if(!q) return alert("Please ask a specific question.");
-        triggerAI(q, "custom", 1);
+        if(!q) return alert("Please type your question first.");
+        executeAI(q, "custom", 1);
     });
 
-    // --- Render AI Charts ---
-    function renderCharts(insights, isAuto) {
+    // ==========================================
+    // 4. CHART RENDERING
+    // ==========================================
+    function renderAICharts(insights, isAuto) {
         if(isAuto) {
             aiChartsContainer.innerHTML = '';
             allCharts.forEach(c => c.destroy());
@@ -175,22 +185,24 @@ document.addEventListener('DOMContentLoaded', () => {
         insights.forEach((item, idx) => {
             let chartId = `aiChart_${Date.now()}_${idx}`; 
             let wrapper = document.createElement('div');
-            wrapper.className = 'glass p-6 rounded-2xl border border-gray-800 flex flex-col';
+            wrapper.className = 'glass p-6 rounded-2xl border border-gray-800 flex flex-col w-full';
 
             wrapper.innerHTML = `
                 <h3 class="text-base font-semibold text-white mb-4 flex items-center">
                     <div class="w-2 h-2 rounded-full bg-blue-500 mr-2"></div> ${item.chartTitle}
                 </h3>
-                <div class="relative w-full h-[250px]"><canvas id="${chartId}"></canvas></div>
+                <div class="relative w-full h-[280px]">
+                    <canvas id="${chartId}"></canvas>
+                </div>
                 <div class="mt-6 space-y-3 text-sm bg-black/40 p-4 rounded-xl border border-gray-800/50">
-                    <p><span class="text-red-400 font-bold bg-red-400/10 px-2 py-0.5 rounded">Issue</span> <br/><span class="text-gray-300 mt-1 block">${item.issue}</span></p>
-                    <p><span class="text-blue-400 font-bold bg-blue-400/10 px-2 py-0.5 rounded">Insight</span> <br/><span class="text-gray-300 mt-1 block">${item.insight}</span></p>
-                    <p><span class="text-green-400 font-bold bg-green-400/10 px-2 py-0.5 rounded">Action</span> <br/><span class="text-gray-300 mt-1 block">${item.action}</span></p>
+                    <p><span class="text-red-400 font-bold bg-red-400/10 px-2 py-0.5 rounded">Issue Detected</span> <br/><span class="text-gray-300 mt-1 block">${item.issue}</span></p>
+                    <p><span class="text-blue-400 font-bold bg-blue-400/10 px-2 py-0.5 rounded">AI Insight</span> <br/><span class="text-gray-300 mt-1 block">${item.insight}</span></p>
+                    <p><span class="text-green-400 font-bold bg-green-400/10 px-2 py-0.5 rounded">Recommended Action</span> <br/><span class="text-gray-300 mt-1 block">${item.action}</span></p>
                 </div>
             `;
             
             if(isAuto) aiChartsContainer.appendChild(wrapper);
-            else aiChartsContainer.prepend(wrapper); // Custom puts it at top
+            else aiChartsContainer.prepend(wrapper); 
 
             const ctx = document.getElementById(chartId);
             const type = ['bar','line','pie','doughnut'].includes(item.type) ? item.type : 'bar';
@@ -205,17 +217,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'],
                         borderRadius: type === 'bar' ? 4 : 0,
                         borderWidth: type === 'pie' || type === 'doughnut' ? 2 : 0,
-                        borderColor: '#111827',
+                        borderColor: '#0a0a0a',
                         fill: type === 'line' ? true : false,
                         tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false, color: '#9ca3af',
-                    plugins: { legend: { display: type !== 'bar', labels: {color:'#9ca3af'} } },
+                    plugins: { legend: { display: type !== 'bar', position: 'bottom', labels: {color:'#9ca3af'} } },
                     scales: (type === 'pie' || type === 'doughnut') ? {} : {
                         x: { ticks: { color: '#6b7280' }, grid: { display: false } },
-                        y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
                     }
                 }
             });
@@ -225,19 +237,22 @@ document.addEventListener('DOMContentLoaded', () => {
         aiChartsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // --- PDF Export ---
-    document.getElementById('btnPDF').addEventListener('click', async () => {
+    // ==========================================
+    // 5. PDF EXPORT (-1 TOKEN)
+    // ==========================================
+    btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
-        if(!email || currentTokens < 1) return alert("You need 1 token to download PDF.");
+        if(!email) return alert("Please sync account first.");
+        if(currentTokens < 1) return alert("You need 1 token to download the PDF report.");
         
-        const btn = document.getElementById('btnPDF');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = 'Generating PDF...';
-        btn.disabled = true;
+        const originalText = btnPDF.innerHTML;
+        btnPDF.innerHTML = 'Generating PDF...';
+        btnPDF.disabled = true;
 
         try {
             const res = await fetch(SERVER_URL, {
                 method: 'POST',
+                headers: {'Content-Type': 'text/plain;charset=utf-8'},
                 body: JSON.stringify({ action: 'deductPdfToken', email: email })
             });
             const data = await res.json();
@@ -247,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tokenCount.innerText = currentTokens;
                 
                 const element = document.getElementById('pdf-export-area');
-                element.style.backgroundColor = '#0a0a0a';
+                element.style.backgroundColor = '#0a0a0a'; 
                 
                 await html2pdf().set({
                     margin: 0.5,
@@ -256,17 +271,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a0a0a' },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
                 }).from(element).save();
-            } else throw new Error(data.message);
+                
+                element.style.backgroundColor = ''; 
+            } else {
+                throw new Error(data.message);
+            }
         } catch(err) {
             alert('PDF Export Failed: ' + err.message);
         } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+            btnPDF.innerHTML = originalText;
+            btnPDF.disabled = false;
         }
     });
 
-    // --- Clear Workspace ---
+    // ==========================================
+    // 6. CLEAR WORKSPACE
+    // ==========================================
     document.getElementById('btnClear').addEventListener('click', () => {
-        if(confirm('Clear dashboard?')) location.reload();
+        if(confirm('Clear all current data?')) {
+            location.reload();
+        }
     });
 });
