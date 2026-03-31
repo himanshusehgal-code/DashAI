@@ -1,6 +1,6 @@
 // app.js
 
-const API_BASE_URL = 'https://dashai-backend.onrender.com'; // Update to your backend
+const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec'; // Update to your backend
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
