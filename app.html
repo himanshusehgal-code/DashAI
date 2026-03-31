@@ -9,71 +9,51 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* 🔥 NEW POLISH FIXES 🔥 */
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            overflow: hidden; /* Main page freeze */
-        }
-
         .glass { background: rgba(13, 17, 23, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .loader { border-top-color: #3b82f6; -webkit-animation: spinner 1s linear infinite; animation: spinner 1s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0d1117; }
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
-        /* 🔥 PDF EXPORT AREA FIX 🔥 */
-        #pdf-export-area {
-            overflow-y: auto;
-            overflow-x: hidden;
-            position: relative;
-            z-index: 1;
-            background: #0d1117;
+        body {
+            overflow: hidden;
         }
 
-        /* 🔥 SCROLL BLUR FIX FOR HEADER 🔥 */
+        #pdf-export-area {
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 🔥 PERFECT GLASSMORPHISM FIX FOR HEADER 🔥 */
         header {
             position: sticky;
             top: 0;
-            z-index: 1000;
-            background: rgba(10, 15, 25, 0.6); /* Semi-transparent */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 60;
+            background: rgba(10, 14, 23, 0.85) !important; /* Semi-transparent */
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
         }
 
-        /* 🔥 SCROLL BLUR FIX FOR ACTION PANEL 🔥 */
+        /* 🔥 PERFECT GLASSMORPHISM FIX FOR ACTION PANEL 🔥 */
         #actionPanelWrapper {
             position: sticky;
-            top: 80px; /* Header height */
-            z-index: 999;
-            background: rgba(10, 15, 25, 0.6); /* Semi-transparent */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        /* 🔥 CHART / PDF BREAK FIX 🔥 */
-        .chart-card {
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-
-        canvas {
-            max-width: 100% !important;
+            top: 5rem; /* 80px - exactly below the h-20 header */
+            z-index: 50;
+            background: rgba(10, 14, 23, 0.85) !important; /* Semi-transparent */
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
     </style>
 </head>
 <body class="bg-[#0a0a0a] text-gray-200 flex h-screen overflow-hidden font-sans selection:bg-blue-500/30">
     
-    <aside class="w-64 glass border-r border-gray-800/50 flex flex-col z-[1001] shadow-2xl">
+    <aside class="w-64 glass border-r border-gray-800/50 flex flex-col z-50 shadow-2xl">
         <div class="h-20 flex items-center px-6 border-b border-gray-800/50">
             <a href="index.html" class="text-2xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">DashupData.</a>
         </div>
@@ -108,9 +88,9 @@
              </div>
         </header>
 
-        <div class="flex-1 p-8 pb-24" id="pdf-export-area">
+        <div class="flex-1 p-8 pb-24 bg-[#0a0a0a]" id="pdf-export-area">
             
-            <div id="dropZone" class="border-2 border-dashed border-gray-700/60 bg-[#161b22]/50 rounded-2xl p-20 text-center hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer mb-8 group shadow-lg">
+            <div id="dropZone" class="border-2 border-dashed border-gray-700/60 bg-[#0d1117] rounded-2xl p-20 text-center hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer mb-8 group shadow-lg">
                 <div class="w-20 h-20 bg-[#161b22] border border-gray-800 rounded-full flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform shadow-xl">
                     <span class="text-4xl">📤</span>
                 </div>
@@ -120,7 +100,8 @@
             </div>
 
             <div id="actionPanelWrapper" class="-mx-8 px-8 py-4 hidden">
-                <div id="actionPanel" class="flex flex-col gap-5 bg-transparent p-4">
+                
+                <div id="actionPanel" class="flex flex-col gap-5 bg-[#0d1117]/80 p-6 rounded-xl border border-gray-700/50 shadow-lg backdrop-blur-md">
                     
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div class="flex gap-4">
@@ -171,7 +152,7 @@
                 </div>
 
                 <div class="mt-8 pt-8 border-t border-gray-800" id="rawDataSection">
-                    <div class="bg-[#0d1117] p-6 rounded-2xl border border-gray-800 flex flex-col max-h-[500px] shadow-2xl chart-card">
+                    <div class="bg-[#0d1117] p-6 rounded-2xl border border-gray-800 flex flex-col max-h-[500px] shadow-2xl">
                         
                         <div class="flex justify-between items-center mb-5">
                             <h3 class="text-base font-bold text-gray-200 flex items-center">
