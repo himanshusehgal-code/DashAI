@@ -122,8 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     actionPanelWrapper.classList.remove('hidden'); 
                     dashboardContent.classList.remove('hidden');
 
-                    // 🔥 AUTO TRIGGER REMOVED TO PREVENT TOKEN LOSS 🔥
-                    // User will manually click the Generate Premium button
+                    // 🔥 AUTO-TRIGGER REMOVED 🔥
+                    // System will ONLY generate Free charts. 
+                    // User must manually click "Generate Full Dashboard" to use tokens.
 
                 } else {
                     alert('CSV file is empty or invalid.');
@@ -449,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. PDF EXPORT & CLEAR
+    // 4. PDF EXPORT (SINGLE CONTINUOUS PAGE)
     // ==========================================
     btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -459,47 +460,61 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
         btnPDF.disabled = true;
 
+        // 🔥 PDF Hiding Logic 🔥
         actionPanelWrapper.style.display = 'none'; 
         rawDataSection.style.display = 'none'; 
 
-        try {
-            const res = await fetch(SERVER_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                body: JSON.stringify({ action: 'deductPdfToken', email: email })
-            });
-            const data = await res.json();
-            
-            if(data.status === 'success') {
-                currentTokens -= 1;
-                tokenCount.innerText = currentTokens;
+        // Let DOM update before taking snapshot
+        setTimeout(async () => {
+            try {
+                const res = await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                    body: JSON.stringify({ action: 'deductPdfToken', email: email })
+                });
+                const data = await res.json();
                 
-                const element = document.getElementById('pdf-export-area');
-                
-                await html2pdf().set({
-                    margin: [0.3, 0.3],
-                    filename: `DashupData_Intelligence_Report_${new Date().toISOString().split('T')[0]}.pdf`,
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a0a0a' },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
-                }).from(element).save();
-                
-            } else {
-                throw new Error(data.message);
+                if(data.status === 'success') {
+                    currentTokens -= 1;
+                    tokenCount.innerText = currentTokens;
+                    
+                    const element = document.getElementById('pdf-export-area');
+                    
+                    // 🔥 SINGLE PAGE PDF LOGIC 🔥
+                    // Get the exact pixel height and width of the dashboard container
+                    const clientWidth = element.scrollWidth;
+                    const clientHeight = element.scrollHeight + 60; // adding tiny padding
+                    
+                    await html2pdf().set({
+                        margin: 0,
+                        filename: `DashupData_Intelligence_Report_${new Date().toISOString().split('T')[0]}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a0a0a', scrollY: 0 },
+                        jsPDF: { 
+                            unit: 'px', 
+                            format: [clientWidth, clientHeight], // Custom dimension forces it into one single page
+                            orientation: 'portrait' 
+                        }
+                    }).from(element).save();
+                    
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch(err) {
+                alert('PDF Export Failed: ' + err.message);
+            } finally {
+                // Restore hidden elements
+                actionPanelWrapper.style.display = 'block';
+                rawDataSection.style.display = 'block';
+                btnPDF.innerHTML = originalText;
+                btnPDF.disabled = false;
             }
-        } catch(err) {
-            alert('PDF Export Failed: ' + err.message);
-        } finally {
-            actionPanelWrapper.style.display = 'block';
-            rawDataSection.style.display = 'block';
-            btnPDF.innerHTML = originalText;
-            btnPDF.disabled = false;
-        }
+        }, 150);
     });
 
     document.getElementById('btnClear').addEventListener('click', () => {
         if(confirm('Clear all visual data and start fresh?')) {
-            sessionStorage.removeItem('aiPayloadData'); // Just in case
+            sessionStorage.removeItem('aiPayloadData');
             location.reload();
         }
     });
