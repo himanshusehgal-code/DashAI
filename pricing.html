@@ -73,76 +73,57 @@
             </div>
         </div>
     </main>
-
-    <script>
-        const API_BASE_URL = 'https://dashai-backend.onrender.com'; // Update to backend
-        const RAZORPAY_KEY_ID = 'aaaa'; // Replace with Razorpay Key ID
+<script>
+        // 🚨 UPDATE: Apna Google Apps Script Web App URL yahan daalein
+        const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
 
         document.querySelectorAll('.payBtn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const email = sessionStorage.getItem('dashupdata_email');
                 if(!email) {
-                    alert('🔒 Please go to the Dashboard and connect your email account first before upgrading.');
+                    alert('🔒 Please go to the Dashboard and Register your Email account first before upgrading.');
                     window.location.href = 'app.html';
                     return;
                 }
                 
                 const btn = e.target;
                 const originalText = btn.innerText;
-                const selectedPlan = btn.getAttribute('data-plan'); // BASIC, PRO, or ENTERPRISE
+                const selectedPlan = btn.getAttribute('data-plan'); // BASIC, PRO, ENTERPRISE, or TEST
                 
                 btn.disabled = true;
-                btn.innerText = 'Initializing...';
+                btn.innerText = 'Generating Payment Link...';
 
                 try {
-                    // Send the selected plan to backend to determine amount and token allocation
-                    const res = await fetch(`${API_BASE_URL}/api/create-order`, { 
+                    // Send request to GAS backend to generate Razorpay link
+                    const res = await fetch(API_BASE_URL, { 
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: email, plan: selectedPlan })
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ 
+                            action: 'createPayment', 
+                            email: email, 
+                            plan: selectedPlan 
+                        })
                     });
                     
-                    if(!res.ok) throw new Error('Failed to create order on server');
-                    const order = await res.json();
+                    const data = await res.json();
         
-                    const options = {
-                        key: RAZORPAY_KEY_ID, 
-                        amount: order.amount,
-                        currency: order.currency,
-                        name: "DashupData Platform",
-                        description: `${selectedPlan} Plan Subscription`,
-                        image: "https://your-logo-url.png", 
-                        order_id: order.id,
-                        prefill: { email: email },
-                        theme: { color: "#2563eb" },
-                        handler: function (response) {
-                            alert(`🎉 Payment successful! Welcome to DashupData ${selectedPlan}. Your account has been credited tokens.`);
-                            window.location.href = "app.html";
-                        },
-                        modal: {
-                            ondismiss: function() {
-                                btn.disabled = false;
-                                btn.innerText = originalText;
-                            }
-                        }
-                    };
-                    const rzp1 = new Razorpay(options);
-                    
-                    rzp1.on('payment.failed', function (response){
-                        alert(`Payment Failed: ${response.error.description}`);
-                        btn.disabled = false;
-                        btn.innerText = originalText;
-                    });
-                    rzp1.open();
+                    if(data.status === 'success' && data.url) {
+                        // User ko directly Razorpay ke secured page par bhej dein
+                        window.location.href = data.url; 
+                    } else {
+                        throw new Error(data.message || 'Failed to create payment link.');
+                    }
 
                 } catch (err) {
                     console.error(err);
-                    alert('⚠️ Payment initialization failed. Please check your connection or backend server.');
+                    alert('⚠️ Payment initialization failed: ' + err.message);
                     btn.disabled = false;
                     btn.innerText = originalText;
                 }
             });
         });
     </script>
+</body>
+</html>
 </body>
 </html>
