@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - DashAI</title>
+    <title>Dashboard - DashupData</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,7 +12,6 @@
         .glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .loader { border-top-color: #3b82f6; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #111827; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
@@ -23,24 +22,28 @@
     
     <aside class="w-64 glass border-r border-gray-800/50 flex flex-col z-20">
         <div class="h-20 flex items-center px-6 border-b border-gray-800/50">
-            <a href="index.html" class="text-2xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">DashAI.</a>
+            <a href="index.html" class="text-2xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">DashupData.</a>
         </div>
         
         <div class="p-4 border-b border-gray-800/50 bg-gray-900/50">
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Register Email Account</label>
-           <input type="email" id="userEmail" placeholder="Enter your email ID" value="<?= typeof detectedEmail !== 'undefined' ? detectedEmail : '' ?>" readonly class="w-full bg-black/50 border border-gray-700 rounded-lg p-2.5 text-sm text-gray-400 focus:outline-none transition-colors mb-2 cursor-not-allowed">
+           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Register Email Account</label>
+           <input type="email" id="userEmail" placeholder="Enter your email ID" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2.5 text-sm text-gray-300 focus:outline-none focus:border-blue-500 transition-colors mb-2">
             <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">Register Email</button>
-            <p class="text-xs text-blue-400 mt-2 text-center font-medium animate-pulse">Get free 5 tokens 🎁</p>
+            <p class="text-xs text-blue-400 mt-2 text-center font-medium animate-pulse">Test Plan: Get free 5 tokens 🎁</p>
             <p id="authStatus" class="text-xs text-green-400 mt-2 hidden text-center">Connected securely</p>
         </div>
         <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <a href="index.html" class="flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Home
+            </a>
             <a href="#" class="flex items-center px-3 py-2.5 rounded-lg bg-blue-600/10 text-blue-400 font-medium">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Workspace
             </a>
             <a href="pricing.html" class="flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                Upgrade to Pro
+                Upgrade Plan
             </a>
         </nav>
     </aside>
@@ -52,7 +55,7 @@
                 <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
                 <span class="text-sm font-medium text-gray-400">Tokens Remaining:</span>
                 <span id="tokenCount" class="text-white font-bold bg-gray-800 px-2 py-0.5 rounded">--</span>
-            </div>
+             </div>
         </header>
 
         <div class="flex-1 overflow-y-auto p-8 pb-24">
@@ -72,7 +75,7 @@
                     <span id="aiBtnText">Run AI Analyst (-1 Token)</span>
                     <div id="aiLoader" class="hidden ml-3 loader ease-linear rounded-full border-2 border-t-2 border-white h-4 w-4"></div>
                 </button>
-                <button id="btnPDF" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center">
+                 <button id="btnPDF" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Export Report
                 </button>
@@ -80,14 +83,13 @@
             </div>
 
             <div id="dashboardContent" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
                 <div id="aiPanel" class="hidden lg:col-span-2 glass p-6 rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-900/10 to-transparent">
                     <div class="flex items-center mb-6 border-b border-indigo-500/20 pb-4">
                         <div class="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center mr-3">
-                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                             <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                         </div>
                         <h3 class="text-xl font-bold text-white">AI Executive Summary</h3>
-                    </div>
+                     </div>
                     <div id="aiResult" class="text-gray-300 space-y-4 whitespace-pre-wrap leading-relaxed prose prose-invert max-w-none text-sm"></div>
                 </div>
 
@@ -97,21 +99,21 @@
                     </h3>
                     <div class="relative w-full h-[300px]">
                         <canvas id="mainChart"></canvas>
-                    </div>
+                     </div>
                 </div>
 
                 <div class="glass p-6 rounded-2xl border border-gray-800 flex flex-col h-[380px]">
                     <h3 class="text-base font-semibold text-white mb-4 flex items-center">
-                        <div class="w-2 h-2 rounded-full bg-gray-400 mr-2"></div> Raw Data Preview (Top 50)
+                         <div class="w-2 h-2 rounded-full bg-gray-400 mr-2"></div> Raw Data Preview (Top 50)
                     </h3>
                     <div class="overflow-auto flex-1 rounded-lg border border-gray-800/50 bg-black/20">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <tbody id="tableBody" class="divide-y divide-gray-800/50 text-gray-300"></tbody>
+                             <tbody id="tableBody" class="divide-y divide-gray-800/50 text-gray-300"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
+          </div>
     </main>
 
     <script src="app.js"></script>
