@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let originalCSVData = ""; 
     let currentTokens = 0;
 
+    // 🔥 FIX 1: AUTO AI RUN (GUARD FLAG) 🔥
+    let isUserTriggered = false;
+
     // ==========================================
     // 1. AUTHENTICATION & SYNC
     // ==========================================
@@ -110,8 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(results.data && results.data.length > 1) {
                     
                     originalCSVData = Papa.unparse(results.data);
-                    
-                    // We extract max 50 rows for the AI to analyze securely & save tokens
                     aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
                     
                     generateKPICards(results.data);
@@ -122,9 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     actionPanelWrapper.classList.remove('hidden'); 
                     dashboardContent.classList.remove('hidden');
 
-                    // 🔥 AUTO-TRIGGER REMOVED 🔥
-                    // System will ONLY generate Free charts. 
-                    // User must manually click "Generate Full Dashboard" to use tokens.
+                    // 🔥 FIX 1: Explicitly stop Auto-Trigger and reset UI 🔥
+                    aiLoader.classList.add('hidden');
+                    btnAutoAI.disabled = false;
+                    btnCustomAI.disabled = false;
 
                 } else {
                     alert('CSV file is empty or invalid.');
@@ -133,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- CSV Download Event ---
     btnDownloadCSV.addEventListener('click', () => {
         if(!originalCSVData) return alert("No data available to download.");
         const blob = new Blob([originalCSVData], { type: 'text/csv;charset=utf-8;' });
@@ -303,7 +304,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 3. PREMIUM AI LOGIC
     // ==========================================
+
+    // 🔥 FIX 1: Ensure user explicitly triggers this 🔥
+    btnAutoAI.addEventListener('click', () => {
+        isUserTriggered = true;
+        executeAI("Generate comprehensive deep analytical dashboard", "auto", 5);
+    });
+
+    btnCustomAI.addEventListener('click', () => {
+        const q = aiQuestion.value.trim();
+        if(!q) return alert("Please type your question first.");
+        isUserTriggered = true;
+        executeAI(q, "custom", 1);
+    });
+
     async function executeAI(question, mode, cost) {
+        if (!isUserTriggered) return;
+        isUserTriggered = false; // Reset
+
         const email = sessionStorage.getItem('dashupdata_email');
         if (!email) return alert('🔒 Please Sync your Account in the sidebar first.');
         if (!aiPayloadData) return alert('Please upload data first.');
@@ -360,13 +378,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btnCustomAI.disabled = false;
         }
     }
-
-    btnAutoAI.addEventListener('click', () => executeAI("Generate comprehensive deep analytical dashboard", "auto", 5));
-    btnCustomAI.addEventListener('click', () => {
-        const q = aiQuestion.value.trim();
-        if(!q) return alert("Please type your question first.");
-        executeAI(q, "custom", 1);
-    });
 
     function renderAICharts(insights, isAuto) {
         if(isAuto) {
@@ -450,7 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. PDF EXPORT (SINGLE CONTINUOUS PAGE)
+    // 4. PDF EXPORT (🔥 FIX 3: PDF BROKEN FIX 🔥)
     // ==========================================
     btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -460,11 +471,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
         btnPDF.disabled = true;
 
-        // 🔥 PDF Hiding Logic 🔥
         actionPanelWrapper.style.display = 'none'; 
         rawDataSection.style.display = 'none'; 
 
-        // Let DOM update before taking snapshot
+        // 🔥 IMPORTANT: Scroll to top to prevent canvas misalignment
+        document.getElementById('pdf-export-area').scrollTop = 0; 
+        window.scrollTo(0, 0);
+
         setTimeout(async () => {
             try {
                 const res = await fetch(SERVER_URL, {
@@ -480,22 +493,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const element = document.getElementById('pdf-export-area');
                     
-                    // 🔥 SINGLE PAGE PDF LOGIC 🔥
-                    // Get the exact pixel height and width of the dashboard container
-                    const clientWidth = element.scrollWidth;
-                    const clientHeight = element.scrollHeight + 60; // adding tiny padding
-                    
-                    await html2pdf().set({
-                        margin: 0,
-                        filename: `DashupData_Intelligence_Report_${new Date().toISOString().split('T')[0]}.pdf`,
+                    // 🔥 UPDATED PDF OPTIONS (A4, Avoid breaks, No cuts)
+                    const opt = {
+                        margin: 10,
+                        filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
                         image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a0a0a', scrollY: 0 },
+                        html2canvas: { 
+                            scale: 2, 
+                            useCORS: true,
+                            scrollY: -window.scrollY
+                        },
                         jsPDF: { 
-                            unit: 'px', 
-                            format: [clientWidth, clientHeight], // Custom dimension forces it into one single page
+                            unit: 'mm', 
+                            format: 'a4', 
                             orientation: 'portrait' 
-                        }
-                    }).from(element).save();
+                        },
+                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    };
+                    
+                    await html2pdf().set(opt).from(element).save();
                     
                 } else {
                     throw new Error(data.message);
@@ -503,7 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(err) {
                 alert('PDF Export Failed: ' + err.message);
             } finally {
-                // Restore hidden elements
                 actionPanelWrapper.style.display = 'block';
                 rawDataSection.style.display = 'block';
                 btnPDF.innerHTML = originalText;
