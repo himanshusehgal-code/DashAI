@@ -4,7 +4,6 @@
 const SERVER_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const actionPanelWrapper = document.getElementById('actionPanelWrapper');
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let originalCSVData = ""; 
     let currentTokens = 0;
 
-    // 🔥 FIX 1: AUTO AI RUN (GUARD FLAG) 🔥
     let isUserTriggered = false;
 
     // ==========================================
@@ -73,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 console.error(err);
                 loginBtn.innerHTML = '🔄 Sync Account';
-                alert('Could not connect to backend server. Ensure API is correct.');
+                alert('Could not connect to backend server.');
             }
         }
     };
@@ -91,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 2. CSV UPLOAD, PARSING & FREE CHARTS
+    // 2. CSV UPLOAD & FREE CHARTS
     // ==========================================
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-900/10'); });
@@ -123,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     actionPanelWrapper.classList.remove('hidden'); 
                     dashboardContent.classList.remove('hidden');
 
-                    // 🔥 FIX 1: Explicitly stop Auto-Trigger and reset UI 🔥
                     aiLoader.classList.add('hidden');
                     btnAutoAI.disabled = false;
                     btnCustomAI.disabled = false;
@@ -177,19 +174,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         kpiContainer.innerHTML = `
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-blue-500">
+                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-blue-500 chart-card">
                     <div class="text-gray-400 text-xs font-bold uppercase">📄 Total Records</div>
                     <div class="text-2xl font-black text-white mt-1">${totalRows.toLocaleString()}</div>
                 </div>
-                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-green-500">
+                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-green-500 chart-card">
                     <div class="text-gray-400 text-xs font-bold uppercase">💰 Total ${sumColName}</div>
                     <div class="text-2xl font-black text-white mt-1">${sumDisplay}</div>
                 </div>
-                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-purple-500">
+                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-purple-500 chart-card">
                     <div class="text-gray-400 text-xs font-bold uppercase">📊 Data Columns</div>
                     <div class="text-2xl font-black text-white mt-1">${headers.length}</div>
                 </div>
-                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-yellow-500">
+                <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-yellow-500 chart-card">
                     <div class="text-gray-400 text-xs font-bold uppercase">⚡ System Status</div>
                     <div class="text-2xl font-black text-white mt-1">Optimized</div>
                 </div>
@@ -205,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
         headers.forEach(h => {
             let isNum = true;
             let uniqueVals = new Set();
-
             rows.forEach(r => {
                 if (r[h] !== "" && r[h] !== null && r[h] !== undefined) {
                     uniqueVals.add(r[h]);
@@ -216,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let colName = h.toLowerCase();
             let isExcluded = /id|zip|phone|date|email|name/i.test(colName);
-
             if (isNum && !isExcluded) numericCols.push({ name: h });
             else if (!isNum && uniqueVals.size > 1 && uniqueVals.size <= 50 && !isExcluded) categoryCols.push({ name: h, uniqueCount: uniqueVals.size });
         });
@@ -229,15 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (categoryCols.length > 0 && bestNumCol) {
             let chartCategories = categoryCols.slice(0, 4); 
-
             chartCategories.forEach((catCol, idx) => {
                 let aggregatedData = {};
-
                 rows.forEach(r => {
                     let category = String(r[catCol.name] || "Unknown").trim();
                     if (!category || category.toLowerCase() === "null") category = "Other";
                     let value = parseFloat(String(r[bestNumCol.name]).replace(/,/g, '').replace(/\$/g, '')) || 0;
-
                     if (!aggregatedData[category]) aggregatedData[category] = 0;
                     aggregatedData[category] += value;
                 });
@@ -250,7 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let chartId = `freeChart_${Date.now()}_${idx}`;
 
                 let wrapper = document.createElement('div');
-                wrapper.className = 'bg-[#161b22] p-5 rounded-2xl border border-gray-700/50 flex flex-col shadow-lg relative overflow-hidden';
+                // Added chart-card class for PDF break avoid
+                wrapper.className = 'chart-card bg-[#161b22] p-5 rounded-2xl border border-gray-700/50 flex flex-col shadow-lg relative overflow-hidden';
                 
                 wrapper.innerHTML = `
                     <div class="absolute top-0 right-0 bg-green-900/30 text-green-400 text-[10px] font-bold px-3 py-1 rounded-bl-lg border-b border-l border-green-500/20">FREE VIEW</div>
@@ -304,8 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 3. PREMIUM AI LOGIC
     // ==========================================
-
-    // 🔥 FIX 1: Ensure user explicitly triggers this 🔥
     btnAutoAI.addEventListener('click', () => {
         isUserTriggered = true;
         executeAI("Generate comprehensive deep analytical dashboard", "auto", 5);
@@ -320,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function executeAI(question, mode, cost) {
         if (!isUserTriggered) return;
-        isUserTriggered = false; // Reset
+        isUserTriggered = false; 
 
         const email = sessionStorage.getItem('dashupdata_email');
         if (!email) return alert('🔒 Please Sync your Account in the sidebar first.');
@@ -338,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mode === 'custom') {
             aiChartsContainer.innerHTML = `
-                <div class="col-span-full text-center text-blue-400 font-bold py-10 bg-[#0d1117] rounded-2xl border border-blue-900/30 shadow-inner flex flex-col items-center justify-center">
+                <div class="col-span-full text-center text-blue-400 font-bold py-10 bg-[#0d1117] rounded-2xl border border-blue-900/30 shadow-inner flex flex-col items-center justify-center chart-card">
                     <div class="loader h-8 w-8 rounded-full border-4 border-t-4 border-blue-500 mb-4"></div>
                     🧠 Generating AI Insight for: "${question}"
                 </div>
@@ -389,7 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
         insights.forEach((item, idx) => {
             let chartId = `aiPremChart_${Date.now()}_${idx}`; 
             let wrapper = document.createElement('div');
-            wrapper.className = 'bg-gradient-to-b from-[#0d1117] to-[#010409] p-6 rounded-2xl border border-blue-900/50 flex flex-col shadow-2xl relative overflow-hidden transition-all hover:border-blue-700/60';
+            // Added chart-card class for PDF break avoid
+            wrapper.className = 'chart-card bg-gradient-to-b from-[#0d1117] to-[#010409] p-6 rounded-2xl border border-blue-900/50 flex flex-col shadow-2xl relative overflow-hidden transition-all hover:border-blue-700/60';
 
             let tag = `<div class="absolute top-0 right-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-xl shadow-lg">PREMIUM AI</div>`;
 
@@ -461,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. PDF EXPORT (🔥 FIX 3: PDF BROKEN FIX 🔥)
+    // 4. PDF EXPORT (🔥 FIXED OPTIONS 🔥)
     // ==========================================
     btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -474,57 +466,52 @@ document.addEventListener('DOMContentLoaded', () => {
         actionPanelWrapper.style.display = 'none'; 
         rawDataSection.style.display = 'none'; 
 
-        // 🔥 IMPORTANT: Scroll to top to prevent canvas misalignment
-        document.getElementById('pdf-export-area').scrollTop = 0; 
-        window.scrollTo(0, 0);
-
-        setTimeout(async () => {
-            try {
-                const res = await fetch(SERVER_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                    body: JSON.stringify({ action: 'deductPdfToken', email: email })
-                });
-                const data = await res.json();
+        try {
+            const res = await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                body: JSON.stringify({ action: 'deductPdfToken', email: email })
+            });
+            const data = await res.json();
+            
+            if(data.status === 'success') {
+                currentTokens -= 1;
+                tokenCount.innerText = currentTokens;
                 
-                if(data.status === 'success') {
-                    currentTokens -= 1;
-                    tokenCount.innerText = currentTokens;
-                    
-                    const element = document.getElementById('pdf-export-area');
-                    
-                    // 🔥 UPDATED PDF OPTIONS (A4, Avoid breaks, No cuts)
-                    const opt = {
-                        margin: 10,
-                        filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { 
-                            scale: 2, 
-                            useCORS: true,
-                            scrollY: -window.scrollY
-                        },
-                        jsPDF: { 
-                            unit: 'mm', 
-                            format: 'a4', 
-                            orientation: 'portrait' 
-                        },
-                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                    };
-                    
-                    await html2pdf().set(opt).from(element).save();
-                    
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch(err) {
-                alert('PDF Export Failed: ' + err.message);
-            } finally {
-                actionPanelWrapper.style.display = 'block';
-                rawDataSection.style.display = 'block';
-                btnPDF.innerHTML = originalText;
-                btnPDF.disabled = false;
+                const element = document.getElementById('pdf-export-area');
+                
+                // 🔥 NEW FIXED CONFIG FOR HTML2PDF 🔥
+                const opt = {
+                    margin: 10,
+                    filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true,
+                        scrollY: 0, // <--- Corrected
+                        windowWidth: document.body.scrollWidth // <--- Corrected
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait' 
+                    },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+                
+                await html2pdf().set(opt).from(element).save();
+                
+            } else {
+                throw new Error(data.message);
             }
-        }, 150);
+        } catch(err) {
+            alert('PDF Export Failed: ' + err.message);
+        } finally {
+            actionPanelWrapper.style.display = 'block';
+            rawDataSection.style.display = 'block';
+            btnPDF.innerHTML = originalText;
+            btnPDF.disabled = false;
+        }
     });
 
     document.getElementById('btnClear').addEventListener('click', () => {
