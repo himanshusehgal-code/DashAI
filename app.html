@@ -35,10 +35,9 @@
             background: #0a0a0a;
         }
 
+        /* 🔥 Solid blur fix so nothing bleeds through 🔥 */
         #actionPanelWrapper {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(10, 10, 10, 0.95); /* solid blur fix */
+            background: #0a0a0a !important; 
         }
     </style>
 </head>
@@ -90,7 +89,7 @@
                 <input type="file" id="fileInput" class="hidden" accept=".csv">
             </div>
 
-            <div id="actionPanelWrapper" class="sticky top-20 z-50 -mx-8 px-8 py-4 bg-[#0a0a0a] backdrop-blur-2xl border-b border-gray-800 shadow-2xl hidden">
+            <div id="actionPanelWrapper" class="sticky top-0 z-[50] -mx-8 -mt-8 pt-8 px-8 pb-4 bg-[#0a0a0a] border-b border-gray-800 shadow-2xl hidden">
                 
                 <div id="actionPanel" class="flex flex-col gap-5 bg-[#0d1117] p-6 rounded-xl border border-gray-700/50 shadow-lg">
                     
