@@ -1,14 +1,15 @@
 // app.js
 
-// 🚨 SERVER URL: YAHAN APNA GOOGLE SCRIPT WEB APP URL DAALEIN 🚨
+// 🚨 UPDATE WITH YOUR SERVER URL 🚨
 const SERVER_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    const actionPanel = document.getElementById('actionPanel');
+    const actionPanelWrapper = document.getElementById('actionPanelWrapper'); // For sticky
     const dashboardContent = document.getElementById('dashboardContent');
+    const rawDataSection = document.getElementById('rawDataSection'); // For PDF hiding
     
     const tableHead = document.getElementById('tableHead');
     const tableBody = document.getElementById('tableBody');
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnAutoAI = document.getElementById('btnAutoAI');
     const btnCustomAI = document.getElementById('btnCustomAI');
     const btnPDF = document.getElementById('btnPDF');
+    const btnDownloadCSV = document.getElementById('btnDownloadCSV');
     const aiQuestion = document.getElementById('aiQuestion');
     const aiLoader = document.getElementById('aiLoader');
     
@@ -30,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let allCharts = [];
     let freeCharts = [];
-    let aiPayloadData = ""; 
+    let aiPayloadData = ""; // limited string for API
+    let originalCSVData = ""; // Full string for CSV download
     let currentTokens = 0;
 
     // ==========================================
@@ -85,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 2. CSV UPLOAD, FREE CHARTS & AUTO-TRIGGER AI
+    // 2. CSV UPLOAD, PARSING & FREE CHARTS
     // ==========================================
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-900/10'); });
@@ -106,23 +109,23 @@ document.addEventListener('DOMContentLoaded', () => {
             complete: (results) => {
                 if(results.data && results.data.length > 1) {
                     
-                    // Prepare data for AI (max 50 rows to save tokens)
+                    // Save Full String for Downloading later
+                    originalCSVData = Papa.unparse(results.data);
+                    
+                    // Prepare data for AI (max 50 rows)
                     aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
                     
-                    // Render Free Stuff instantly
                     generateKPICards(results.data);
                     generateFreeDynamicCharts(results.data);
                     renderDataPreview(results.data.slice(0, 50)); 
                     
                     dropZone.classList.add('hidden');
-                    actionPanel.classList.remove('hidden');
+                    actionPanelWrapper.classList.remove('hidden'); // Show Sticky panel wrapper
                     dashboardContent.classList.remove('hidden');
 
-                    // 🔥 AUTO TRIGGER AI DASHBOARD (-5 TOKENS) AFTER 800ms
+                    // Auto Trigger AI
                     setTimeout(() => {
-                        if (currentTokens >= 5) {
-                            btnAutoAI.click();
-                        }
+                        if (currentTokens >= 5) btnAutoAI.click();
                     }, 800);
 
                 } else {
@@ -132,14 +135,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- KPI CARDS GENERATOR ---
+    // --- CSV Download Event ---
+    btnDownloadCSV.addEventListener('click', () => {
+        if(!originalCSVData) return alert("No data available to download.");
+        const blob = new Blob([originalCSVData], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `DashupData_Export_${Date.now()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
     function generateKPICards(rows) {
         const totalRows = rows.length;
         const headers = Object.keys(rows[0]);
         let totalSum = 0;
         let sumColName = "Value";
 
-        // Find best column to sum
         for (let h of headers) {
             let isNum = true;
             let sum = 0;
@@ -289,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // 3. PREMIUM AI INTEGRATION LOGIC
+    // 3. PREMIUM AI LOGIC
     // ==========================================
     async function executeAI(question, mode, cost) {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -306,7 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btnAutoAI.disabled = true;
         btnCustomAI.disabled = true;
 
-        // Custom Mode UX Loading State
         if (mode === 'custom') {
             aiChartsContainer.innerHTML = `
                 <div class="col-span-full text-center text-blue-400 font-bold py-10 bg-[#0d1117] rounded-2xl border border-blue-900/30 shadow-inner flex flex-col items-center justify-center">
@@ -332,10 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tokenCount.innerText = currentTokens;
                 aiSectionWrapper.classList.remove('hidden');
                 
-                if (mode === 'custom') {
-                    // Remove loading block
-                    aiChartsContainer.firstElementChild.remove();
-                }
+                if (mode === 'custom') aiChartsContainer.firstElementChild.remove();
 
                 renderAICharts(result.insights, mode === 'auto');
             } else {
@@ -344,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error(err);
-            alert('⚠️ Network error. Could not connect to OpenAI Backend.');
+            alert('⚠️ Network error. Could not connect to Backend.');
             if(mode === 'custom') aiChartsContainer.firstElementChild.remove();
         } finally {
             aiLoader.classList.add('hidden');
@@ -360,7 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
         executeAI(q, "custom", 1);
     });
 
-    // --- Render Premium AI Charts (KILLER UI UPGRADE) ---
     function renderAICharts(insights, isAuto) {
         if(isAuto) {
             aiChartsContainer.innerHTML = '';
@@ -375,7 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let tag = `<div class="absolute top-0 right-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-xl shadow-lg">PREMIUM AI</div>`;
 
-            // THE KILLER NEW LAYOUT
             wrapper.innerHTML = `
                 ${tag}
 
@@ -445,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. PDF EXPORT (-1 TOKEN) & CLEAR
+    // 4. PDF EXPORT (Hide Table logic included)
     // ==========================================
     btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -454,6 +462,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalText = btnPDF.innerHTML;
         btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
         btnPDF.disabled = true;
+
+        // 🔥 PDF Exclusions - Temporary Hiding 🔥
+        actionPanelWrapper.style.display = 'none'; // Hide the sticky control buttons
+        rawDataSection.style.display = 'none'; // Hide the Raw Table permanently from PDF
 
         try {
             const res = await fetch(SERVER_URL, {
@@ -483,6 +495,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(err) {
             alert('PDF Export Failed: ' + err.message);
         } finally {
+            // 🔥 Restore Elements 🔥
+            actionPanelWrapper.style.display = 'block';
+            rawDataSection.style.display = 'block';
             btnPDF.innerHTML = originalText;
             btnPDF.disabled = false;
         }
