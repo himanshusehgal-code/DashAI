@@ -1,165 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="dark">
 <head>
-<meta charset="UTF-8">
-<title>Pricing - DashAI</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0b0e14;
-  color:#c9d1d9;
-  text-align:center;
-  padding:40px 20px;
-}
-
-h1{
-  margin-bottom:30px;
-}
-
-.container{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:20px;
-}
-
-.card{
-  background:#161b22;
-  padding:25px;
-  border-radius:12px;
-  width:260px;
-  border:1px solid #30363d;
-  transition:0.3s;
-}
-
-.card:hover{
-  transform:translateY(-5px);
-  border-color:#1f6feb;
-}
-
-.price{
-  font-size:28px;
-  color:white;
-  margin:10px 0;
-}
-
-.tokens{
-  font-size:14px;
-  color:#8b949e;
-}
-
-button{
-  margin-top:15px;
-  width:100%;
-  padding:12px;
-  background:#1f6feb;
-  border:none;
-  border-radius:6px;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-button:hover{
-  opacity:0.9;
-}
-
-.back{
-  margin-top:30px;
-  display:inline-block;
-  color:#1f6feb;
-  cursor:pointer;
-}
-
-.status{
-  margin-top:20px;
-  font-size:13px;
-  color:#8b949e;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - DashAI Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
 </head>
+<body class="bg-[#0a0a0a] text-white font-sans antialiased min-h-screen flex flex-col">
+    <nav class="p-6 max-w-7xl mx-auto w-full flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">DashAI.</a>
+        <a href="app.html" class="text-sm font-medium text-gray-400 hover:text-white transition-colors bg-gray-900 px-4 py-2 rounded-lg border border-gray-800">Go to Dashboard &rarr;</a>
+    </nav>
 
-<body>
+    <main class="flex-1 flex items-center justify-center py-12 px-4">
+        <div class="max-w-5xl w-full">
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Unlock the Full Power of Data</h1>
+                <p class="text-gray-400 text-lg">One simple plan. No hidden fees. Cancel anytime.</p>
+            </div>
 
-<h1>💳 Choose Your Plan</h1>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-center">
+                <div class="glass p-10 rounded-3xl border border-gray-800">
+                    <h3 class="text-xl font-semibold text-gray-300 mb-2">Starter</h3>
+                    <div class="flex items-baseline mb-8">
+                        <span class="text-5xl font-extrabold">₹0</span>
+                        <span class="text-gray-500 ml-2">/ forever</span>
+                    </div>
+                    <ul class="space-y-4 mb-10 text-gray-400 text-sm">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 5 AI Insight Tokens</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Basic Chart Visualizations</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> PDF Report Export</li>
+                        <li class="flex items-center opacity-40"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Priority Processing</li>
+                    </ul>
+                    <a href="app.html" class="block w-full bg-gray-900 hover:bg-gray-800 border border-gray-700 text-center py-3.5 rounded-xl font-semibold transition-colors">Current Plan</a>
+                </div>
 
-<div class="container">
+                <div class="bg-gradient-to-b from-blue-900/40 to-gray-900 p-10 rounded-3xl border border-blue-500/50 relative shadow-2xl shadow-blue-500/10 transform md:-translate-y-4">
+                    <div class="absolute top-0 right-8 transform -translate-y-1/2">
+                        <span class="bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide shadow-lg">Most Popular</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-2">Professional</h3>
+                    <div class="flex items-baseline mb-8">
+                        <span class="text-5xl font-extrabold text-white">₹499</span>
+                        <span class="text-gray-400 ml-2">/ month</span>
+                    </div>
+                    <ul class="space-y-4 mb-10 text-gray-300 text-sm">
+                        <li class="flex items-center text-white font-medium"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited AI Tokens</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Advanced Data Visualizations</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> White-label PDF Exports</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Priority Server Processing</li>
+                    </ul>
+                    <button id="payBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-center py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/25 flex justify-center items-center">
+                        <span id="payBtnText">Upgrade Now</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                    <p class="text-xs text-center text-gray-500 mt-4">Secured by Razorpay. Auto-renews monthly.</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
-<!-- BASIC -->
-<div class="card">
-  <h2>Basic</h2>
-  <div class="price">₹199</div>
-  <div class="tokens">200 Tokens</div>
-  <button onclick="buy('BASIC')">Buy Now</button>
-</div>
+    <script>
+        // 🚨 CONFIGURATION 🚨 Same as app.js
+        const API_BASE_URL = 'https://dashai-backend.onrender.com'; // Update to your backend URL
+        const RAZORPAY_KEY_ID = 'aaaa'; // 🚨 Replace with your actual Razorpay Key ID
 
-<!-- PRO -->
-<div class="card">
-  <h2>Pro</h2>
-  <div class="price">₹499</div>
-  <div class="tokens">700 Tokens</div>
-  <button onclick="buy('PRO')">Buy Now</button>
-</div>
+        document.getElementById('payBtn').addEventListener('click', async () => {
+            const email = sessionStorage.getItem('dashai_email');
+            if(!email) {
+                alert('🔒 Please go to the Dashboard and connect your email account first before upgrading.');
+                window.location.href = 'app.html';
+                return;
+            }
+            
+            const btn = document.getElementById('payBtn');
+            const btnText = document.getElementById('payBtnText');
+            btn.disabled = true;
+            btnText.innerText = 'Initializing...';
 
-<!-- ELITE -->
-<div class="card">
-  <h2>Elite</h2>
-  <div class="price">₹999</div>
-  <div class="tokens">2000 Tokens</div>
-  <button onclick="buy('ENTERPRISE')">Buy Now</button>
-</div>
+            try {
+                // 1. Create order on your backend
+                const res = await fetch(`${API_BASE_URL}/api/create-order`, { method: 'POST' });
+                if(!res.ok) throw new Error('Failed to create order on server');
+                const order = await res.json();
+                
+                // 2. Open Razorpay Checkout Modal
+                const options = {
+                    key: RAZORPAY_KEY_ID, 
+                    amount: order.amount,
+                    currency: order.currency,
+                    name: "DashAI Platform",
+                    description: "Pro Plan Subscription (1 Month)",
+                    image: "https://your-logo-url.png", // Optional
+                    order_id: order.id,
+                    prefill: { email: email },
+                    theme: { color: "#2563eb" },
+                    handler: function (response) {
+                        // Payment Success! The backend Webhook will catch this and update Google Sheets.
+                        // We alert the user and redirect.
+                        alert("🎉 Payment successful! Welcome to DashAI Pro. Your account will be upgraded momentarily.");
+                        window.location.href = "app.html";
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            btn.disabled = false;
+                            btnText.innerText = 'Upgrade Now';
+                        }
+                    }
+                };
+                
+                const rzp1 = new Razorpay(options);
+                
+                rzp1.on('payment.failed', function (response){
+                    alert(`Payment Failed: ${response.error.description}`);
+                    btn.disabled = false;
+                    btnText.innerText = 'Upgrade Now';
+                });
+                
+                rzp1.open();
 
-</div>
-
-<div class="status" id="statusText">
-Secure payment powered by Razorpay 🔒
-</div>
-
-<div class="back" onclick="goBack()">← Back to Dashboard</div>
-
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec";
-
-let email = "guest_user"; // later replace with real user
-
-async function buy(plan){
-  const status = document.getElementById("statusText");
-  status.innerText = "Creating payment link... ⏳";
-
-  try{
-    const res = await fetch(API_URL,{
-      method:"POST",
-      body: JSON.stringify({
-        action:"createPayment",
-        email:email,
-        plan:plan
-      })
-    });
-
-    const data = await res.json();
-
-    if(data.status === "success"){
-      status.innerText = "Redirecting to payment...";
-
-      // 🔥 redirect to Razorpay
-      window.location.href = data.url;
-
-    } else {
-      status.innerText = "Payment failed ❌";
-    }
-
-  } catch(err){
-    status.innerText = "Server error ❌";
-  }
-}
-
-// 🔙 Back to app
-function goBack(){
-  window.location.href = "app.html";
-}
-</script>
-
+            } catch (err) {
+                console.error(err);
+                alert('⚠️ Payment initialization failed. Please check your connection or backend server.');
+                btn.disabled = false;
+                btnText.innerText = 'Upgrade Now';
+            }
+        });
+    </script>
 </body>
 </html>
