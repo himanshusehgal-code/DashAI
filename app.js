@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    const actionPanelWrapper = document.getElementById('actionPanelWrapper'); // For sticky
+    const actionPanelWrapper = document.getElementById('actionPanelWrapper');
     const dashboardContent = document.getElementById('dashboardContent');
-    const rawDataSection = document.getElementById('rawDataSection'); // For PDF hiding
+    const rawDataSection = document.getElementById('rawDataSection'); 
     
     const tableHead = document.getElementById('tableHead');
     const tableBody = document.getElementById('tableBody');
@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let allCharts = [];
     let freeCharts = [];
-    let aiPayloadData = ""; // limited string for API
-    let originalCSVData = ""; // Full string for CSV download
+    let aiPayloadData = ""; 
+    let originalCSVData = ""; 
     let currentTokens = 0;
 
     // ==========================================
@@ -109,10 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
             complete: (results) => {
                 if(results.data && results.data.length > 1) {
                     
-                    // Save Full String for Downloading later
                     originalCSVData = Papa.unparse(results.data);
                     
-                    // Prepare data for AI (max 50 rows)
+                    // We extract max 50 rows for the AI to analyze securely & save tokens
                     aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
                     
                     generateKPICards(results.data);
@@ -120,13 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderDataPreview(results.data.slice(0, 50)); 
                     
                     dropZone.classList.add('hidden');
-                    actionPanelWrapper.classList.remove('hidden'); // Show Sticky panel wrapper
+                    actionPanelWrapper.classList.remove('hidden'); 
                     dashboardContent.classList.remove('hidden');
 
-                    // Auto Trigger AI
-                    setTimeout(() => {
-                        if (currentTokens >= 5) btnAutoAI.click();
-                    }, 800);
+                    // 🔥 AUTO TRIGGER REMOVED TO PREVENT TOKEN LOSS 🔥
+                    // User will manually click the Generate Premium button
 
                 } else {
                     alert('CSV file is empty or invalid.');
@@ -386,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             wrapper.innerHTML = `
                 ${tag}
-
                 <div class="flex items-center justify-between mb-4 mt-3">
                     <h3 class="text-base font-bold text-white flex items-center">
                         <span class="mr-3 text-xl bg-blue-500/20 p-2 rounded-lg border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]">📊</span> ${item.chartTitle}
@@ -453,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. PDF EXPORT (Hide Table logic included)
+    // 4. PDF EXPORT & CLEAR
     // ==========================================
     btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -463,9 +459,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
         btnPDF.disabled = true;
 
-        // 🔥 PDF Exclusions - Temporary Hiding 🔥
-        actionPanelWrapper.style.display = 'none'; // Hide the sticky control buttons
-        rawDataSection.style.display = 'none'; // Hide the Raw Table permanently from PDF
+        actionPanelWrapper.style.display = 'none'; 
+        rawDataSection.style.display = 'none'; 
 
         try {
             const res = await fetch(SERVER_URL, {
@@ -495,7 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(err) {
             alert('PDF Export Failed: ' + err.message);
         } finally {
-            // 🔥 Restore Elements 🔥
             actionPanelWrapper.style.display = 'block';
             rawDataSection.style.display = 'block';
             btnPDF.innerHTML = originalText;
@@ -504,6 +498,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnClear').addEventListener('click', () => {
-        if(confirm('Clear all visual data and start fresh?')) location.reload();
+        if(confirm('Clear all visual data and start fresh?')) {
+            sessionStorage.removeItem('aiPayloadData'); // Just in case
+            location.reload();
+        }
     });
 });
