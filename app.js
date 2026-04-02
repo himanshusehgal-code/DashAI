@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 4. PDF EXPORT (🔥 FIXED: Landscape + Exact Width 🔥)
     // ==========================================
-    btnPDF.addEventListener('click', async () => {
+  btnPDF.addEventListener('click', async () => {
     const email = sessionStorage.getItem('dashupdata_email');
     if(!email || currentTokens < 1) return alert("You need 1 token to download the PDF report.");
     
@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
     actionPanelWrapper.style.display = 'none'; 
     rawDataSection.style.display = 'none'; 
 
-    // Reset scroll position
+    // scroll reset
     const exportArea = document.getElementById('pdf-export-area');
     exportArea.scrollTop = 0; 
     window.scrollTo(0, 0);
@@ -486,15 +486,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const element = document.getElementById('pdf-export-area');
 
-                // ✅ FORCE FULL WIDTH (MAIN FIX)
+                // ✅ FORCE FULL WIDTH
                 const originalWidth = element.style.width;
                 const originalMaxWidth = element.style.maxWidth;
 
                 element.style.width = element.scrollWidth + "px";
                 element.style.maxWidth = "none";
 
-                // wait for charts render
-                await new Promise(res => setTimeout(res, 300));
+                // wait for charts render properly
+                await new Promise(res => setTimeout(res, 400));
 
                 const opt = {
                     margin: [5, 5, 5, 5],
@@ -516,12 +516,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         orientation: 'landscape'
                     },
 
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    // 🔥 FINAL PAGE BREAK FIX
+                    pagebreak: { 
+                        mode: ['css', 'legacy'],
+                        before: '.chart-card',
+                        avoid: ['.chart-card']
+                    }
                 };
 
                 await html2pdf().set(opt).from(element).save();
 
-                // ✅ RESTORE
+                // ✅ RESTORE ORIGINAL STATE
                 element.style.width = originalWidth;
                 element.style.maxWidth = originalMaxWidth;
 
