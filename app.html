@@ -13,9 +13,10 @@
             box-sizing: border-box;
         }
 
-        body {
-            overflow: hidden; /* Main page freeze, only right side scrolls */
-        }
+       body {
+    overflow-x: hidden;
+    overflow-y: auto; /* 🔥 FIX for full PDF capture */
+}
 
         .glass { background: rgba(13, 17, 23, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .loader { border-top-color: #3b82f6; -webkit-animation: spinner 1s linear infinite; animation: spinner 1s linear infinite; }
@@ -27,13 +28,13 @@
         ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
         /* Dashboard Scroll Area */
-        #pdf-export-area {
-            overflow-y: auto;
-            overflow-x: hidden;
-            position: relative;
-            z-index: 1;
-            background: #0a0a0a;
-        }
+      #pdf-export-area {
+    overflow: visible !important;   /* 🔥 MOST IMPORTANT FIX */
+    height: auto !important;
+    position: relative;
+    z-index: 1;
+    background: #0a0a0a;
+}
 
         /* Top Header remains fixed for aesthetics */
         header {
@@ -53,14 +54,19 @@
         }
 
         /* Chart / PDF Break Fix */
-        .chart-card {
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
+       .chart-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+        html, body {
+    height: auto !important;
+}
 
         canvas {
-            max-width: 100% !important;
-        }
+    max-width: 100% !important;
+    height: auto !important;
+}
 
         /* 🔥 MOBILE TAB CSS LOGIC 🔥 */
         @media (max-width: 767px) {
