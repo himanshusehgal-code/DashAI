@@ -47,7 +47,10 @@
             max-width: 100% !important;
             height: auto !important;
         }
-
+         #mainContainer {
+    overflow-y: auto;
+    height: 100%;
+}
         /* 🔥 MOBILE TAB CSS LOGIC 🔥 */
         @media (max-width: 767px) {
             body.mobile-tab-actions #dashboardContent {
@@ -69,7 +72,7 @@
         }
     </style>
 </head>
-<body class="bg-[#0a0a0a] text-gray-200 flex flex-col md:flex-row h-screen overflow-hidden font-sans selection:bg-blue-500/30 mobile-tab-actions">
+<body class="bg-[#0a0a0a] <body class="bg-[#0a0a0a] text-gray-200 flex flex-col md:flex-row min-h-screen overflow-auto font-sans selection:bg-blue-500/30 mobile-tab-actions">
     
     <div id="mobileTabs" class="md:hidden flex w-full bg-[#0d1117] border-b border-gray-800 z-[2000] flex-shrink-0 items-center px-2 py-1">
         
