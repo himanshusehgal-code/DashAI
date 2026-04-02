@@ -723,58 +723,63 @@
             // ==========================================
             // 🔥 5. PDF EXPORT LOGIC (UPDATED TO RENDER API)
             // ==========================================
-            btnPDF.addEventListener('click', async () => {
-                const email = sessionStorage.getItem('dashupdata_email');
-                if(!email) return alert("Please Sync your Account first.");
-                if(currentTokens < 1) return alert("❌ Insufficient tokens. You need 1 token to download the PDF report.");
-                
-                const originalText = btnPDF.innerHTML;
-                btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Generating PDF...';
-                btnPDF.disabled = true;
+          btnPDF.addEventListener('click', async () => {
+    const email = sessionStorage.getItem('dashupdata_email');
+    if(!email) return alert("Please Sync your Account first.");
+    if(currentTokens < 1) return alert("❌ Need 1 token.");
 
-                try {
-                    // 1. Deduct Token using Google Apps Script
-                    const tokenRes = await fetch(SERVER_URL, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                        body: JSON.stringify({ action: 'deductPdfToken', email: email })
-                    });
-                    const tokenData = await tokenRes.json();
-                    
-                    if(tokenData.status === 'success') {
-                        currentTokens -= 1;
-                        tokenCount.innerText = currentTokens;
-                        
-                        // 2. Fetch PDF from Render Python Backend
-                        const PDF_URL = 'https://support-dashupdata.onrender.com/export-dashboard-pdf';
-                        const currentUrl = window.location.href; 
-                        
-                        const pdfRes = await fetch(`${PDF_URL}?url=${encodeURIComponent(currentUrl)}`, {
-                            method: 'POST'
-                        });
-                        
-                        if (!pdfRes.ok) throw new Error("Failed to generate PDF from Python server");
-                        
-                        // 3. Download PDF
-                        const blob = await pdfRes.blob();
-                        const link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+    const originalText = btnPDF.innerHTML;
+    btnPDF.innerHTML = 'Generating PDF...';
+    btnPDF.disabled = true;
 
-                    } else {
-                        throw new Error(tokenData.message);
-                    }
-                } catch(err) {
-                    alert('PDF Export Failed: ' + err.message);
-                } finally {
-                    btnPDF.innerHTML = originalText;
-                    btnPDF.disabled = false;
-                }
-            });
+    try {
+        // Token deduct (same as before)
+        const tokenRes = await fetch(SERVER_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'text/plain;charset=utf-8'},
+            body: JSON.stringify({ action: 'deductPdfToken', email: email })
+        });
 
+        const tokenData = await tokenRes.json();
+
+        if(tokenData.status === 'success') {
+            currentTokens -= 1;
+            tokenCount.innerText = currentTokens;
+
+            // 🔥 REAL PDF GENERATION
+            const element = document.getElementById("dashboardContent");
+
+            // hide unwanted UI
+            document.getElementById("actionPanelWrapper").style.display = "none";
+            document.getElementById("mobileAside").style.display = "none";
+
+            await new Promise(res => setTimeout(res, 1000));
+
+            const opt = {
+                margin: 5,
+                filename: `DashupData_Report_${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            await html2pdf().set(opt).from(element).save();
+
+            // restore UI
+            document.getElementById("actionPanelWrapper").style.display = "";
+            document.getElementById("mobileAside").style.display = "";
+
+        } else {
+            throw new Error(tokenData.message);
+        }
+
+    } catch(err) {
+        alert('PDF Export Failed: ' + err.message);
+    } finally {
+        btnPDF.innerHTML = originalText;
+        btnPDF.disabled = false;
+    }
+});
             document.getElementById('btnClear').addEventListener('click', () => {
                 if(confirm('Clear all visual data and start fresh?')) {
                     sessionStorage.removeItem('aiPayloadData');
