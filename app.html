@@ -9,10 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         .glass { background: rgba(13, 17, 23, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .loader { border-top-color: #3b82f6; -webkit-animation: spinner 1s linear infinite; animation: spinner 1s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -22,7 +19,6 @@
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
-        /* Top Header (Sticky removed so it scrolls normally) */
         header {
             z-index: 1000;
             background: rgba(10, 10, 10, 0.9);
@@ -31,64 +27,30 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        #actionPanelWrapper {
-            position: relative; 
-            z-index: 10;
-            margin-bottom: 1.5rem;
-        }
+        #actionPanelWrapper { position: relative; z-index: 10; margin-bottom: 1.5rem; }
+       .chart-card { break-inside: avoid; page-break-inside: avoid; }
+        canvas { max-width: 100% !important; height: auto !important; }
+        #mainContainer { overflow-y: auto; height: 100%; }
 
-        /* Chart / PDF Break Fix */
-       .chart-card {
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-
-        canvas {
-            max-width: 100% !important;
-            height: auto !important;
-        }
-         #mainContainer {
-    overflow-y: auto;
-    height: 100%;
-}
-        /* 🔥 MOBILE TAB CSS LOGIC 🔥 */
         @media (max-width: 767px) {
-            body.mobile-tab-actions #dashboardContent {
-                display: none !important;
-            }
+            body.mobile-tab-actions #dashboardContent { display: none !important; }
             body.mobile-tab-dashboard #mobileAside,
             body.mobile-tab-dashboard #dropZone,
-            body.mobile-tab-dashboard #actionPanelWrapper {
-                display: none !important;
-            }
-            aside#mobileAside {
-                height: auto;
-                max-height: 45vh; 
-            }
-          #pdf-export-area {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* center vertically */
-}
+            body.mobile-tab-dashboard #actionPanelWrapper { display: none !important; }
+            aside#mobileAside { height: auto; max-height: 45vh; }
+            #pdf-export-area { display: flex; flex-direction: column; justify-content: center; }
         }
     </style>
 </head>
 <body class="bg-[#0a0a0a] text-gray-200 flex flex-col md:flex-row h-screen overflow-hidden font-sans selection:bg-blue-500/30 mobile-tab-actions">
     
     <div id="mobileTabs" class="md:hidden flex w-full bg-[#0d1117] border-b border-gray-800 z-[2000] flex-shrink-0 items-center px-2 py-1">
-        
-        <a href="index.html" class="p-2 bg-gray-800/60 hover:bg-gray-700 rounded-lg text-xl border border-gray-700 shadow-sm shrink-0 transition-colors" title="Home">
-            🏠
-        </a>
-
+        <a href="index.html" class="p-2 bg-gray-800/60 hover:bg-gray-700 rounded-lg text-xl border border-gray-700 shadow-sm shrink-0 transition-colors" title="Home">🏠</a>
         <div class="flex-1 flex mx-2">
             <button onclick="setMobileTab('actions')" id="tabBtnActions" class="flex-1 py-2 text-xs sm:text-sm font-bold transition-colors text-blue-400 border-b-2 border-blue-500 shadow-[inset_0_-2px_10px_rgba(59,130,246,0.1)] truncate px-1">Setup</button>
             <button onclick="setMobileTab('dashboard')" id="tabBtnDashboard" class="flex-1 py-2 text-xs sm:text-sm font-bold transition-colors text-gray-500 border-b-2 border-transparent truncate px-1">Dashboard</button>
         </div>
-
-        <a href="pricing.html" class="p-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 rounded-lg text-xl border border-yellow-500/30 shadow-sm shrink-0 transition-colors" title="Upgrade Plan">
-            ⚡
-        </a>
+        <a href="pricing.html" class="p-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 rounded-lg text-xl border border-yellow-500/30 shadow-sm shrink-0 transition-colors" title="Upgrade Plan">⚡</a>
     </div>
 
     <aside id="mobileAside" class="w-full md:w-64 glass border-b md:border-r md:border-b-0 border-gray-800/50 flex flex-col z-[1001] shadow-2xl flex-shrink-0">
@@ -104,15 +66,9 @@
         </div>
         
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto hidden md:block">
-            <a href="index.html" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors font-medium text-sm">
-                <span class="text-lg mr-3">🏠</span> Home
-            </a>
-            <a href="#" class="flex items-center px-4 py-3 rounded-lg bg-blue-600/10 text-blue-400 font-semibold text-sm border border-blue-500/20">
-                <span class="text-lg mr-3">🗂️</span> Workspace
-            </a>
-            <a href="pricing.html" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors font-medium text-sm">
-                <span class="text-lg mr-3">⚡</span> Upgrade Plan
-            </a>
+            <a href="index.html" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors font-medium text-sm"><span class="text-lg mr-3">🏠</span> Home</a>
+            <a href="#" class="flex items-center px-4 py-3 rounded-lg bg-blue-600/10 text-blue-400 font-semibold text-sm border border-blue-500/20"><span class="text-lg mr-3">🗂️</span> Workspace</a>
+            <a href="pricing.html" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors font-medium text-sm"><span class="text-lg mr-3">⚡</span> Upgrade Plan</a>
         </nav>
     </aside>
 
@@ -130,37 +86,15 @@
 
         <div class="flex-1 flex flex-col justify-start p-4 md:p-8 pb-24" id="pdf-export-area">
             
-            <div id="dropZone" 
-class="border-2 border-dashed border-gray-700/60 bg-[#161b22]/50 rounded-2xl 
-p-8 md:p-20 text-center cursor-pointer mb-8 group shadow-lg 
-mx-auto w-full max-w-4xl 
-transition-all duration-300 ease-in-out
-hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
-
-    <div class="w-16 h-16 md:w-20 md:h-20 bg-[#161b22] border border-gray-800 
-    rounded-full flex items-center justify-center mx-auto mb-5 
-    transition-all duration-300 
-    group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(59,130,246,0.4)]">
-
-        <span class="text-3xl md:text-4xl transition-transform duration-300 group-hover:-translate-y-1">
-            📤
-        </span>
-    </div>
-
-    <h3 class="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight">
-        Upload your dataset
-    </h3>
-
-    <p class="text-sm md:text-base text-gray-400 font-medium mb-4">
-        Drag & drop a CSV file here, or click to browse
-    </p>
-
-    <p class="text-xs text-gray-500">
-        Supported format: <span class="text-blue-400 font-semibold">.CSV</span>
-    </p>
-
-    <input type="file" id="fileInput" class="hidden" accept=".csv">
-</div>
+            <div id="dropZone" class="border-2 border-dashed border-gray-700/60 bg-[#161b22]/50 rounded-2xl p-8 md:p-20 text-center cursor-pointer mb-8 group shadow-lg mx-auto w-full max-w-4xl transition-all duration-300 ease-in-out hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-[#161b22] border border-gray-800 rounded-full flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(59,130,246,0.4)]">
+                    <span class="text-3xl md:text-4xl transition-transform duration-300 group-hover:-translate-y-1">📤</span>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight">Upload your dataset</h3>
+                <p class="text-sm md:text-base text-gray-400 font-medium mb-4">Drag & drop a CSV file here, or click to browse</p>
+                <p class="text-xs text-gray-500">Supported format: <span class="text-blue-400 font-semibold">.CSV</span></p>
+                <input type="file" id="fileInput" class="hidden" accept=".csv">
+            </div>
 
             <div id="actionPanelWrapper" class="hidden">
                 <div id="actionPanel" class="flex flex-col gap-5 bg-gradient-to-br from-[#0d1117] to-[#010409] p-4 md:p-6 rounded-2xl border border-gray-800 shadow-xl">
@@ -171,8 +105,12 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                                 <span class="text-lg mr-2">⚡</span> Generate Dashboard (-5)
                             </button>
                             
+                            <button id="btnPivot" class="w-full sm:w-auto bg-[#21262d] hover:bg-[#30363d] text-gray-200 border border-gray-600 px-6 py-3 rounded-lg text-sm font-bold transition-colors flex items-center justify-center shadow-md">
+                                <span class="text-lg mr-2">📊</span> Generate Pivots (-1)
+                            </button>
+
                             <button id="btnPDF" class="w-full sm:w-auto bg-[#21262d] hover:bg-[#30363d] text-gray-200 border border-gray-600 px-6 py-3 rounded-lg text-sm font-bold transition-colors flex items-center justify-center shadow-md">
-                                <span class="text-lg mr-2">📄</span> Export Report
+                                <span class="text-lg mr-2">📄</span> Export Report (-1)
                             </button>
                         </div>
                         
@@ -203,19 +141,16 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                 <div id="freeSectionWrapper">
                     <h2 class="text-lg font-bold text-gray-300 mb-4 flex items-center"><span class="text-green-500 mr-2">📈</span> Free Instant Overview</h2>
                     <div id="kpiContainer" class="mb-6"></div>
-                    <div id="freeChartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-                        </div>
+                    <div id="freeChartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full"></div>
                 </div>
 
                 <div id="aiSectionWrapper" class="hidden">
                     <h2 class="text-lg font-bold text-blue-400 mb-4 flex items-center mt-4 pt-6 border-t border-gray-800"><span class="mr-2">🧠</span> Premium AI Insights</h2>
-                    <div id="aiChartsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
-                        </div>
+                    <div id="aiChartsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full"></div>
                 </div>
 
                 <div class="mt-8 pt-8 border-t border-gray-800" id="rawDataSection">
                     <div class="bg-[#0d1117] p-4 md:p-6 rounded-2xl border border-gray-800 flex flex-col max-h-[500px] shadow-2xl chart-card">
-                        
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5">
                             <h3 class="text-base font-bold text-gray-200 flex items-center">
                                  <span class="text-xl mr-2">🗄️</span> Raw Data Preview (Sample)
@@ -224,7 +159,6 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                                 <span class="mr-2">💾</span> Download Data (.csv)
                             </button>
                         </div>
-
                         <div class="overflow-auto flex-1 rounded-xl border border-gray-700/80 bg-[#010409] custom-scrollbar">
                             <table class="w-full text-left text-sm whitespace-nowrap">
                                  <thead id="tableHead" class="bg-[#161b22] text-gray-300 sticky top-0 border-b border-gray-700 z-10 shadow-md"></thead>
@@ -233,7 +167,6 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                         </div>
                     </div>
                 </div>
-
             </div>
           </div>
     </main>
@@ -257,7 +190,6 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
             }
         }
 
-        // AUTO-SWITCH OBSERVER: Automatically go to Dashboard tab when charts load
         document.addEventListener("DOMContentLoaded", () => {
             const dashboardNode = document.getElementById('dashboardContent');
             if (dashboardNode) {
@@ -266,7 +198,7 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                         if (mutation.attributeName === 'class') {
                             const isHidden = dashboardNode.classList.contains('hidden');
                             if (!isHidden && window.innerWidth < 768) {
-                                setMobileTab('dashboard'); // Auto switch if mobile!
+                                setMobileTab('dashboard'); 
                             }
                         }
                     });
@@ -277,11 +209,10 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
     </script>
     
     <script>
-        // 🚨 UPDATE WITH YOUR SERVER URL 🚨
+        // 🚨 GOOGLE APPS SCRIPT URL 🚨
         const SERVER_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // DOM Elements
             const dropZone = document.getElementById('dropZone');
             const fileInput = document.getElementById('fileInput');
             const actionPanelWrapper = document.getElementById('actionPanelWrapper');
@@ -298,6 +229,7 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
             const btnAutoAI = document.getElementById('btnAutoAI');
             const btnCustomAI = document.getElementById('btnCustomAI');
             const btnPDF = document.getElementById('btnPDF');
+            const btnPivot = document.getElementById('btnPivot'); // 🔥 Added Element
             const btnDownloadCSV = document.getElementById('btnDownloadCSV');
             const aiQuestion = document.getElementById('aiQuestion');
             const aiLoader = document.getElementById('aiLoader');
@@ -370,9 +302,7 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
             // 2. CSV UPLOAD, PARSING & FREE CHARTS
             // ==========================================
             dropZone.addEventListener('click', (e) => {
-                if (e.target.id !== 'fileInput') {
-                    fileInput.click();
-                }
+                if (e.target.id !== 'fileInput') fileInput.click();
             });
             dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-900/10'); });
             dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500', 'bg-blue-900/10'));
@@ -381,9 +311,7 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                 if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
             });
             fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length) {
-                    handleFile(e.target.files[0]);
-                }
+                if (e.target.files.length) handleFile(e.target.files[0]);
                 e.target.value = ''; 
             });
             
@@ -394,7 +322,6 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                     header: true, skipEmptyLines: true,
                     complete: (results) => {
                         if(results.data && results.data.length > 1) {
-                            
                             originalCSVData = Papa.unparse(results.data);
                             aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
                             
@@ -409,7 +336,6 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                             aiLoader.classList.add('hidden');
                             btnAutoAI.disabled = false;
                             btnCustomAI.disabled = false;
-
                         } else {
                             alert('CSV file is empty or invalid.');
                         }
@@ -640,7 +566,6 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                             const loader = document.getElementById('tempLoader');
                             if(loader) loader.remove();
                         }
-
                         renderAICharts(result.insights, mode === 'auto');
                     } else {
                         alert(`Error: ${result.message}`);
@@ -684,22 +609,18 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                                 <span class="mr-3 text-xl bg-blue-500/20 p-2 rounded-lg border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]">📊</span> ${item.chartTitle}
                             </h3>
                         </div>
-
                         <div class="relative w-full h-[260px]">
                             <canvas id="${chartId}"></canvas>
                         </div>
-
                         <div class="mt-5 grid gap-3 text-sm">
                             <div class="bg-red-500/10 border border-red-500/20 p-3.5 rounded-xl shadow-inner">
                                 <div class="text-red-400 font-bold text-xs mb-1.5 uppercase tracking-wide flex items-center"><span class="mr-2">⚠</span> Issue Detected</div>
                                 <div class="text-gray-300 leading-relaxed font-medium">${item.issue}</div>
                             </div>
-
                             <div class="bg-blue-500/10 border border-blue-500/20 p-3.5 rounded-xl shadow-inner">
                                 <div class="text-blue-400 font-bold text-xs mb-1.5 uppercase tracking-wide flex items-center"><span class="mr-2">💡</span> Insight</div>
                                 <div class="text-gray-300 leading-relaxed font-medium">${item.insight}</div>
                             </div>
-
                             <div class="bg-green-500/10 border border-green-500/20 p-3.5 rounded-xl shadow-inner">
                                 <div class="text-green-400 font-bold text-xs mb-1.5 uppercase tracking-wide flex items-center"><span class="mr-2">🚀</span> Action Suggested</div>
                                 <div class="text-gray-300 leading-relaxed font-medium">${item.action}</div>
@@ -739,106 +660,127 @@ hover:border-blue-500/60 hover:bg-blue-500/5 hover:shadow-blue-500/10">
                     });
                     allCharts.push(newChart);
                 });
-                
                 if(isAuto) aiSectionWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
             // ==========================================
-            // 4. PDF EXPORT (🔥 FIXED: Landscape + Exact Width 🔥)
+            // 🔥 4. GENERATE PIVOTS LOGIC (NEW RENDER API)
+            // ==========================================
+            btnPivot.addEventListener('click', async () => {
+                const email = sessionStorage.getItem('dashupdata_email');
+                if(!email) return alert("Please Sync your Account first.");
+                if(currentTokens < 1) return alert("❌ Insufficient tokens. You need 1 token to generate Pivots.");
+                if(!originalCSVData) return alert("No data uploaded to pivot.");
+
+                const originalText = btnPivot.innerHTML;
+                btnPivot.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Processing...';
+                btnPivot.disabled = true;
+
+                try {
+                    // 1. Deduct Token using Google Apps Script
+                    const tokenRes = await fetch(SERVER_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                        body: JSON.stringify({ action: 'deductPdfToken', email: email })
+                    });
+                    const tokenData = await tokenRes.json();
+
+                    if(tokenData.status === 'success') {
+                        currentTokens -= 1;
+                        tokenCount.innerText = currentTokens;
+
+                        // 2. Fetch from Render Python Backend
+                        const PIVOT_URL = 'https://support-dashupdata.onrender.com/generate-pivot';
+                        const response = await fetch(PIVOT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ csv_data: originalCSVData })
+                        });
+
+                        if (!response.ok) throw new Error("Python Backend failed to generate pivot.");
+
+                        // 3. Download CSV Output
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `DashupData_Pivot_Summary_${Date.now()}.csv`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        
+                    } else {
+                        throw new Error(tokenData.message);
+                    }
+                } catch(err) {
+                    alert('Pivot Generation Failed: ' + err.message);
+                } finally {
+                    btnPivot.innerHTML = originalText;
+                    btnPivot.disabled = false;
+                }
+            });
+
+            // ==========================================
+            // 🔥 5. PDF EXPORT LOGIC (UPDATED TO RENDER API)
             // ==========================================
             btnPDF.addEventListener('click', async () => {
                 const email = sessionStorage.getItem('dashupdata_email');
-                if(!email || currentTokens < 1) return alert("You need 1 token to download the PDF report.");
+                if(!email) return alert("Please Sync your Account first.");
+                if(currentTokens < 1) return alert("❌ Insufficient tokens. You need 1 token to download the PDF report.");
                 
                 const originalText = btnPDF.innerHTML;
-                btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
+                btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Generating PDF...';
                 btnPDF.disabled = true;
 
-                actionPanelWrapper.style.display = 'none'; 
-                rawDataSection.style.display = 'none'; 
-
-                // scroll reset
-                const exportArea = document.getElementById('pdf-export-area');
-                
-                const mainContainer = document.getElementById('mainContainer');
-                mainContainer.scrollTop = 0; 
-
-                setTimeout(async () => {
-                    try {
-                        const res = await fetch(SERVER_URL, {
-                            method: 'POST',
-                            headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                            body: JSON.stringify({ action: 'deductPdfToken', email: email })
-                        });
-
-                        const data = await res.json();
+                try {
+                    // 1. Deduct Token using Google Apps Script
+                    const tokenRes = await fetch(SERVER_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                        body: JSON.stringify({ action: 'deductPdfToken', email: email })
+                    });
+                    const tokenData = await tokenRes.json();
+                    
+                    if(tokenData.status === 'success') {
+                        currentTokens -= 1;
+                        tokenCount.innerText = currentTokens;
                         
-                        if(data.status === 'success') {
-                            currentTokens -= 1;
-                            tokenCount.innerText = currentTokens;
-                            
-                            const element = document.getElementById('pdf-export-area');
+                        // 2. Fetch PDF from Render Python Backend
+                        const PDF_URL = 'https://support-dashupdata.onrender.com/export-dashboard-pdf';
+                        const currentUrl = window.location.href; 
+                        
+                        const pdfRes = await fetch(`${PDF_URL}?url=${encodeURIComponent(currentUrl)}`, {
+                            method: 'POST'
+                        });
+                        
+                        if (!pdfRes.ok) throw new Error("Failed to generate PDF from Python server");
+                        
+                        // 3. Download PDF
+                        const blob = await pdfRes.blob();
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
 
-                            // ✅ FORCE EXPAND FOR PDF EXPORT ONLY (So it doesn't clip)
-                            const originalOverflow = mainContainer.style.overflow;
-                            mainContainer.style.overflow = 'visible';
-
-                            // wait for charts render properly
-                            await new Promise(res => setTimeout(res, 400));
-
-                            const opt = {
-                                margin: [5, 5, 5, 5],
-                                filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
-                                image: { type: 'jpeg', quality: 1 },
-
-                                html2canvas: {
-                                    scale: 2,
-                                    useCORS: true,
-                                    scrollX: 0,
-                                    scrollY: 0,
-                                    windowWidth: element.scrollWidth,
-                                    windowHeight: element.scrollHeight
-                                },
-
-                                jsPDF: {
-                                    unit: 'mm',
-                                    format: 'a4',
-                                    orientation: 'landscape'
-                                },
-
-                                pagebreak: { 
-                                    mode: ['css', 'legacy'],
-                                    before: '.chart-card',
-                                    avoid: ['.chart-card']
-                                }
-                            };
-
-                            await html2pdf().set(opt).from(element).save();
-
-                            // ✅ RESTORE NORMAL SCROLL AFTER PDF EXPORT
-                            mainContainer.style.overflow = originalOverflow;
-
-                        } else {
-                            throw new Error(data.message);
-                        }
-
-                    } catch(err) {
-                        alert('PDF Export Failed: ' + err.message);
-                    } finally {
-                        actionPanelWrapper.style.display = 'block';
-                        rawDataSection.style.display = 'block';
-                        btnPDF.innerHTML = originalText;
-                        btnPDF.disabled = false;
+                    } else {
+                        throw new Error(tokenData.message);
                     }
-                }, 150);
+                } catch(err) {
+                    alert('PDF Export Failed: ' + err.message);
+                } finally {
+                    btnPDF.innerHTML = originalText;
+                    btnPDF.disabled = false;
+                }
             });
-        });
 
-        document.getElementById('btnClear').addEventListener('click', () => {
-            if(confirm('Clear all visual data and start fresh?')) {
-                sessionStorage.removeItem('aiPayloadData');
-                location.reload();
-            }
+            document.getElementById('btnClear').addEventListener('click', () => {
+                if(confirm('Clear all visual data and start fresh?')) {
+                    sessionStorage.removeItem('aiPayloadData');
+                    location.reload();
+                }
+            });
         });
     </script>
 </body>
