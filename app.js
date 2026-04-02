@@ -455,74 +455,94 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. PDF EXPORT (🔥 FIXED: Landscape + Exact Width 🔥)
     // ==========================================
     btnPDF.addEventListener('click', async () => {
-        const email = sessionStorage.getItem('dashupdata_email');
-        if(!email || currentTokens < 1) return alert("You need 1 token to download the PDF report.");
-        
-        const originalText = btnPDF.innerHTML;
-        btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
-        btnPDF.disabled = true;
+    const email = sessionStorage.getItem('dashupdata_email');
+    if(!email || currentTokens < 1) return alert("You need 1 token to download the PDF report.");
+    
+    const originalText = btnPDF.innerHTML;
+    btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
+    btnPDF.disabled = true;
 
-        actionPanelWrapper.style.display = 'none'; 
-        rawDataSection.style.display = 'none'; 
+    actionPanelWrapper.style.display = 'none'; 
+    rawDataSection.style.display = 'none'; 
 
-        // Reset scroll position to top to prevent canvas offset bugs
-        document.getElementById('pdf-export-area').scrollTop = 0; 
-        window.scrollTo(0, 0);
+    // Reset scroll position
+    const exportArea = document.getElementById('pdf-export-area');
+    exportArea.scrollTop = 0; 
+    window.scrollTo(0, 0);
 
-        setTimeout(async () => {
-            try {
-                const res = await fetch(SERVER_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                    body: JSON.stringify({ action: 'deductPdfToken', email: email })
-                });
-                const data = await res.json();
+    setTimeout(async () => {
+        try {
+            const res = await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                body: JSON.stringify({ action: 'deductPdfToken', email: email })
+            });
+
+            const data = await res.json();
+            
+            if(data.status === 'success') {
+                currentTokens -= 1;
+                tokenCount.innerText = currentTokens;
                 
-                if(data.status === 'success') {
-                    currentTokens -= 1;
-                    tokenCount.innerText = currentTokens;
-                    
-                    const element = document.getElementById('pdf-export-area');
-                    
-                    // 🔥 THE FIX: Use Landscape & target element's actual width
-                    const opt = {
-                        margin: [10, 10, 10, 10],
-                        filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { 
-                            scale: 2, 
-                            useCORS: true,
-                            scrollY: 0,
-                            windowWidth: element.scrollWidth // Only capture the dashboard's width
-                        },
-                        jsPDF: { 
-                            unit: 'mm', 
-                            format: 'a4', 
-                            orientation: 'landscape' // Dashboard looks best wide
-                        },
-                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                    };
-                    
-                    await html2pdf().set(opt).from(element).save();
-                    
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch(err) {
-                alert('PDF Export Failed: ' + err.message);
-            } finally {
-                actionPanelWrapper.style.display = 'block';
-                rawDataSection.style.display = 'block';
-                btnPDF.innerHTML = originalText;
-                btnPDF.disabled = false;
-            }
-        }, 150);
-    });
+                const element = document.getElementById('pdf-export-area');
 
-    document.getElementById('btnClear').addEventListener('click', () => {
-        if(confirm('Clear all visual data and start fresh?')) {
-            sessionStorage.removeItem('aiPayloadData');
-            location.reload();
+                // ✅ FORCE FULL WIDTH (MAIN FIX)
+                const originalWidth = element.style.width;
+                const originalMaxWidth = element.style.maxWidth;
+
+                element.style.width = element.scrollWidth + "px";
+                element.style.maxWidth = "none";
+
+                // wait for charts render
+                await new Promise(res => setTimeout(res, 300));
+
+                const opt = {
+                    margin: [5, 5, 5, 5],
+                    filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 1 },
+
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: element.scrollWidth,
+                        windowHeight: element.scrollHeight
+                    },
+
+                    jsPDF: {
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'landscape'
+                    },
+
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                await html2pdf().set(opt).from(element).save();
+
+                // ✅ RESTORE
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+
+            } else {
+                throw new Error(data.message);
+            }
+
+        } catch(err) {
+            alert('PDF Export Failed: ' + err.message);
+        } finally {
+            actionPanelWrapper.style.display = 'block';
+            rawDataSection.style.display = 'block';
+            btnPDF.innerHTML = originalText;
+            btnPDF.disabled = false;
         }
-    });
+    }, 150);
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+    if(confirm('Clear all visual data and start fresh?')) {
+        sessionStorage.removeItem('aiPayloadData');
+        location.reload();
+    }
 });
