@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     originalCSVData = Papa.unparse(results.data);
                     aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
                     generateKPICards(results.data);
-                    generateFreeDynamicCharts(results.data); // 🔥 RESTORED FULL LOGIC
+                    generateFreeDynamicCharts(results.data);
                     renderDataPreview(results.data.slice(0, 50)); 
                     dropZone.classList.add('hidden');
                     actionPanelWrapper.classList.remove('hidden'); 
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // 3. THE ORIGINAL FREE CHARTS LOGIC (RE-RESTORED)
+    // 3. THE ORIGINAL FREE CHARTS LOGIC
     // ==========================================
     function generateKPICards(rows) {
         const totalRows = rows.length;
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. NEW PIVOT & PDF LOGIC (TOKEN PROTECTED)
+    // 4. NEW PIVOT & PDF LOGIC (FIXED FETCH)
     // ==========================================
     btnPivot.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -236,13 +236,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ csv_data: originalCSVData })
                 });
+                if (!response.ok) throw new Error("Render server error");
+
                 const blob = await response.blob();
                 const a = document.createElement('a');
                 a.href = window.URL.createObjectURL(blob);
                 a.download = `Pivot_Summary_${Date.now()}.csv`;
                 a.click();
             }
-        } catch(e) { alert(e.message); } finally { btnPivot.innerHTML = '📊 Generate Pivots (-1)'; btnPivot.disabled = false; }
+        } catch(e) { alert("Pivot Failed: " + e.message); } finally { btnPivot.innerHTML = '📊 Generate Pivots (-1)'; btnPivot.disabled = false; }
     });
 
     btnPDF.addEventListener('click', async () => {
@@ -253,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPDF.disabled = true;
 
         try {
+            // Step 1: Token Deduct
             const tokenRes = await fetch(SERVER_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'text/plain;charset=utf-8'},
@@ -264,14 +267,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTokens -= 1;
                 tokenCount.innerText = currentTokens;
                 
-                const pdfRes = await fetch(`${RENDER_BASE_URL}/export-dashboard-pdf?url=${encodeURIComponent(window.location.href)}`, { method: 'POST' });
+                // 🔥 FIXED PDF FETCH: Using JSON Body to avoid URL length issues
+                const pdfRes = await fetch(`${RENDER_BASE_URL}/export-dashboard-pdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: window.location.href })
+                });
+
+                if (!pdfRes.ok) throw new Error("Backend could not generate PDF");
+
                 const blob = await pdfRes.blob();
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
                 link.download = `AI_Report_${Date.now()}.pdf`;
                 link.click();
             }
-        } catch(e) { alert(e.message); } finally { btnPDF.innerHTML = '📄 Export Report (-1)'; btnPDF.disabled = false; }
+        } catch(e) { alert("PDF Error: " + e.message); } finally { btnPDF.innerHTML = '📄 Export Report (-1)'; btnPDF.disabled = false; }
     });
 
     // ==========================================
