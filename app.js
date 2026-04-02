@@ -1,5 +1,8 @@
-// 🚨 UPDATE WITH YOUR SERVER URL 🚨
+// 🚨 UPDATE WITH YOUR SERVER URL (Google Apps Script for Tokens) 🚨
 const SERVER_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
+
+// 🚨 RENDER BACKEND URL (Python API for Files) 🚨
+const RENDER_BASE_URL = 'https://support-dashupdata.onrender.com';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
@@ -19,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnAutoAI = document.getElementById('btnAutoAI');
     const btnCustomAI = document.getElementById('btnCustomAI');
     const btnPDF = document.getElementById('btnPDF');
+    const btnPivot = document.getElementById('btnPivot'); 
     const btnDownloadCSV = document.getElementById('btnDownloadCSV');
     const aiQuestion = document.getElementById('aiQuestion');
     const aiLoader = document.getElementById('aiLoader');
@@ -37,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isUserTriggered = false;
 
     // ==========================================
-    // 1. AUTHENTICATION & SYNC
+    // 1. AUTHENTICATION & SYNC (Google Apps Script)
     // ==========================================
     const loadUser = async () => {
         const email = sessionStorage.getItem('dashupdata_email');
@@ -45,18 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
             userEmailInput.value = email;
             try {
                 loginBtn.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Syncing...';
-                
                 const res = await fetch(SERVER_URL, {
                     method: 'POST',
                     headers: {'Content-Type': 'text/plain;charset=utf-8'},
                     body: JSON.stringify({ action: 'getUserInfo', email: email })
                 });
                 const data = await res.json();
-
                 if(data.status === 'success') {
                     currentTokens = data.tokens;
                     tokenCount.innerText = currentTokens;
-                    
                     authStatus.classList.remove('hidden');
                     loginBtn.innerHTML = '✅ Account Synced';
                     loginBtn.classList.replace('bg-[#1f6feb]', 'bg-[#161b22]');
@@ -64,17 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     loginBtn.classList.replace('text-white', 'text-green-400');
                     userEmailInput.classList.add('cursor-not-allowed', 'opacity-50');
                     userEmailInput.readOnly = true;
-                } else {
-                    throw new Error(data.message);
                 }
             } catch (err) {
                 console.error(err);
                 loginBtn.innerHTML = '🔄 Sync Account';
-                alert('Could not connect to backend server. Ensure API is correct.');
             }
         }
     };
-    
     loadUser();
     
     loginBtn.addEventListener('click', () => {
@@ -88,101 +85,162 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 2. CSV UPLOAD, PARSING & FREE CHARTS
+    // 2. CSV UPLOAD LOGIC
     // ==========================================
-    
-    // 🔥 FIXED: Prevent event bubbling loop
-    dropZone.addEventListener('click', (e) => {
-        if (e.target.id !== 'fileInput') {
-            fileInput.click();
-        }
-    });
-    
+    dropZone.addEventListener('click', (e) => { if (e.target.id !== 'fileInput') fileInput.click(); });
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-900/10'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500', 'bg-blue-900/10'));
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault(); dropZone.classList.remove('border-blue-500', 'bg-blue-900/10');
         if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
     });
-    
-    // 🔥 FIXED: Reset input value so same file can be re-uploaded if cleared
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) {
-            handleFile(e.target.files[0]);
-        }
-        e.target.value = ''; 
-    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); e.target.value = ''; });
     
     const handleFile = (file) => {
         if(!file.name.endsWith('.csv')) return alert('Please upload a valid CSV file.');
-        
         Papa.parse(file, {
             header: true, skipEmptyLines: true,
             complete: (results) => {
                 if(results.data && results.data.length > 1) {
-                    
                     originalCSVData = Papa.unparse(results.data);
                     aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
-                    
                     generateKPICards(results.data);
                     generateFreeDynamicCharts(results.data);
                     renderDataPreview(results.data.slice(0, 50)); 
-                    
                     dropZone.classList.add('hidden');
                     actionPanelWrapper.classList.remove('hidden'); 
                     dashboardContent.classList.remove('hidden');
-
-                    aiLoader.classList.add('hidden');
-                    btnAutoAI.disabled = false;
-                    btnCustomAI.disabled = false;
-
-                } else {
-                    alert('CSV file is empty or invalid.');
                 }
             }
         });
     };
 
-    btnDownloadCSV.addEventListener('click', () => {
-        if(!originalCSVData) return alert("No data available to download.");
-        const blob = new Blob([originalCSVData], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `DashupData_Export_${Date.now()}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    // ==========================================
+    // 🔥 3. PIVOT GENERATION (Token -1 then Render)
+    // ==========================================
+    btnPivot.addEventListener('click', async () => {
+        const email = sessionStorage.getItem('dashupdata_email');
+        if(!email) return alert("Please Sync your Account first.");
+        if(currentTokens < 1) return alert("❌ Insufficient tokens. You need 1 token to generate pivots.");
+        if(!originalCSVData) return alert("Please upload data first.");
+
+        const originalText = btnPivot.innerHTML;
+        btnPivot.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Processing (May take 50s)...';
+        btnPivot.disabled = true;
+
+        try {
+            // Step 1: Token deduct karo GAS par
+            const tokenRes = await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                body: JSON.stringify({ action: 'deductPivotToken', email: email })
+            });
+            const tokenData = await tokenRes.json();
+
+            if(tokenData.status === 'success') {
+                currentTokens -= 1;
+                tokenCount.innerText = currentTokens;
+
+                // Step 2: Render Backend se Pivot file lo
+                const response = await fetch(`${RENDER_BASE_URL}/generate-pivot`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ csv_data: originalCSVData })
+                });
+
+                if (!response.ok) throw new Error("Render server failed to process pivots.");
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Pivot_Summary_${Date.now()}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } else {
+                throw new Error(tokenData.message);
+            }
+        } catch(err) {
+            alert('Pivot Error: ' + err.message);
+        } finally {
+            btnPivot.innerHTML = originalText;
+            btnPivot.disabled = false;
+        }
     });
 
+    // ==========================================
+    // 🔥 4. PDF EXPORT (Token -1 then Render Playwright)
+    // ==========================================
+    btnPDF.addEventListener('click', async () => {
+        const email = sessionStorage.getItem('dashupdata_email');
+        if(!email) return alert("Please Sync your Account first.");
+        if(currentTokens < 1) return alert("❌ Insufficient tokens. You need 1 token for PDF report.");
+        
+        const originalText = btnPDF.innerHTML;
+        btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Waking Server (Wait 50s)...';
+        btnPDF.disabled = true;
+
+        try {
+            // Step 1: Token deduct karo GAS par
+            const tokenRes = await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                body: JSON.stringify({ action: 'deductPdfToken', email: email })
+            });
+            const tokenData = await tokenRes.json();
+            
+            if(tokenData.status === 'success') {
+                currentTokens -= 1;
+                tokenCount.innerText = currentTokens;
+                
+                // Step 2: Render se Playwright PDF mangwao
+                const currentUrl = window.location.href; 
+                const pdfRes = await fetch(`${RENDER_BASE_URL}/export-dashboard-pdf?url=${encodeURIComponent(currentUrl)}`, {
+                    method: 'POST'
+                });
+                
+                if (!pdfRes.ok) throw new Error("Render server failed to generate clean PDF.");
+                
+                const blob = await pdfRes.blob();
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = `AI_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                throw new Error(tokenData.message);
+            }
+        } catch(err) {
+            alert('PDF Export Failed: ' + err.message);
+        } finally {
+            btnPDF.innerHTML = originalText;
+            btnPDF.disabled = false;
+        }
+    });
+
+    // ==========================================
+    // 5. UTILITY FUNCTIONS (Charts, KPI, etc.)
+    // ==========================================
     function generateKPICards(rows) {
         const totalRows = rows.length;
         const headers = Object.keys(rows[0]);
         let totalSum = 0;
         let sumColName = "Value";
-
         for (let h of headers) {
             let isNum = true;
-            let sum = 0;
-            for (let i=0; i<Math.min(50, rows.length); i++) {
-                let r = rows[i];
-                let cleanVal = String(r[h]).replace(/,/g, '').replace(/\$/g, '').trim();
-                let val = parseFloat(cleanVal);
+            for (let i=0; i<Math.min(20, rows.length); i++) {
+                let val = parseFloat(String(rows[i][h]).replace(/,/g, '').replace(/\$/g, ''));
                 if (isNaN(val)) { isNum = false; break; }
-                sum += val;
             }
             if (isNum && !(/id|zip|phone|date/i.test(h))) {
                 sumColName = h;
-                rows.forEach(r => {
-                    let v = parseFloat(String(r[h]).replace(/,/g, '').replace(/\$/g, '')) || 0;
-                    totalSum += v;
-                });
+                rows.forEach(r => { totalSum += parseFloat(String(r[h]).replace(/,/g, '').replace(/\$/g, '')) || 0; });
                 break;
             }
         }
-
         let sumDisplay = totalSum > 1000000 ? (totalSum/1000000).toFixed(2) + 'M' : (totalSum > 1000 ? (totalSum/1000).toFixed(1) + 'k' : Math.round(totalSum));
-
         kpiContainer.innerHTML = `
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div class="bg-[#161b22] p-4 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-blue-500 chart-card">
@@ -201,374 +259,90 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="text-gray-400 text-xs font-bold uppercase">⚡ System Status</div>
                     <div class="text-2xl font-black text-white mt-1">Optimized</div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
     function generateFreeDynamicCharts(rows) {
         const headers = Object.keys(rows[0]);
         let numericCols = [];
         let categoryCols = [];
-
         headers.forEach(h => {
             let isNum = true;
             let uniqueVals = new Set();
-            rows.forEach(r => {
-                if (r[h] !== "" && r[h] !== null && r[h] !== undefined) {
-                    uniqueVals.add(r[h]);
-                    let cleanVal = String(r[h]).replace(/,/g, '').replace(/\$/g, '').trim();
-                    if (isNaN(parseFloat(cleanVal))) isNum = false;
-                }
+            rows.slice(0, 100).forEach(r => {
+                uniqueVals.add(r[h]);
+                if (isNaN(parseFloat(String(r[h]).replace(/,/g, '')))) isNum = false;
             });
-
-            let colName = h.toLowerCase();
-            let isExcluded = /id|zip|phone|date|email|name/i.test(colName);
-            if (isNum && !isExcluded) numericCols.push({ name: h });
-            else if (!isNum && uniqueVals.size > 1 && uniqueVals.size <= 50 && !isExcluded) categoryCols.push({ name: h, uniqueCount: uniqueVals.size });
+            if (isNum && !(/id|zip|phone|date/i.test(h))) numericCols.push(h);
+            else if (!isNum && uniqueVals.size > 1 && uniqueVals.size <= 15) categoryCols.push(h);
         });
-
-        let bestNumCol = numericCols.find(c => /sale|profit|price|amount|revenue|total|qty/i.test(c.name)) || numericCols[numericCols.length - 1];
-
+        let bestNum = numericCols[0] || headers[0];
         freeChartsContainer.innerHTML = '';
-        freeCharts.forEach(c => c.destroy());
-        freeCharts = [];
-
-        if (categoryCols.length > 0 && bestNumCol) {
-            let chartCategories = categoryCols.slice(0, 4); 
-            chartCategories.forEach((catCol, idx) => {
-                let aggregatedData = {};
-                rows.forEach(r => {
-                    let category = String(r[catCol.name] || "Unknown").trim();
-                    if (!category || category.toLowerCase() === "null") category = "Other";
-                    let value = parseFloat(String(r[bestNumCol.name]).replace(/,/g, '').replace(/\$/g, '')) || 0;
-                    if (!aggregatedData[category]) aggregatedData[category] = 0;
-                    aggregatedData[category] += value;
-                });
-
-                let sortedData = Object.entries(aggregatedData).sort((a,b) => b[1] - a[1]).slice(0, 8);
-                const labels = sortedData.map(item => item[0]);
-                const vals = sortedData.map(item => item[1]);
-
-                let chartType = catCol.uniqueCount <= 5 ? (idx % 2 === 0 ? 'doughnut' : 'pie') : 'bar';
-                let chartId = `freeChart_${Date.now()}_${idx}`;
-
-                let wrapper = document.createElement('div');
-                wrapper.className = 'chart-card bg-[#161b22] p-5 rounded-2xl border border-gray-700/50 flex flex-col shadow-lg relative overflow-hidden';
-                
-                wrapper.innerHTML = `
-                    <div class="absolute top-0 right-0 bg-green-900/30 text-green-400 text-[10px] font-bold px-3 py-1 rounded-bl-lg border-b border-l border-green-500/20">FREE VIEW</div>
-                    <h3 class="text-sm font-bold text-gray-200 mb-4 mt-1 flex items-center">
-                        <span class="mr-2 text-blue-400">📊</span> ${bestNumCol.name} by ${catCol.name}
-                    </h3>
-                    <div class="relative w-full h-[250px]">
-                        <canvas id="${chartId}"></canvas>
-                    </div>
-                `;
-                freeChartsContainer.appendChild(wrapper);
-
-                const ctx = document.getElementById(chartId);
-                let bgColors = ['#1f6feb', '#238636', '#f59e0b', '#da3633', '#8957e5', '#14b8a6', '#0ea5e9', '#f43f5e'];
-
-                let newChart = new Chart(ctx, {
-                    type: chartType,
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: bestNumCol.name,
-                            data: vals,
-                            backgroundColor: chartType === 'bar' ? '#1f6feb' : bgColors,
-                            borderRadius: chartType === 'bar' ? 6 : 0,
-                            borderWidth: chartType === 'bar' ? 0 : 2,
-                            borderColor: '#161b22'
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false, color: '#8b949e',
-                        plugins: { legend: { display: chartType !== 'bar', position: 'right', labels: {color:'#8b949e', font:{family:'Inter'}} } },
-                        scales: (chartType === 'pie' || chartType === 'doughnut') ? {} : {
-                            x: { ticks: { color: '#8b949e', font:{family:'Inter'} }, grid: { display: false } },
-                            y: { ticks: { color: '#8b949e', font:{family:'Inter'} }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
-                        }
-                    }
-                });
-                freeCharts.push(newChart);
+        categoryCols.slice(0, 2).forEach((cat, idx) => {
+            let aggregated = {};
+            rows.forEach(r => {
+                let key = r[cat] || "Unknown";
+                aggregated[key] = (aggregated[key] || 0) + (parseFloat(String(r[bestNum]).replace(/,/g, '')) || 0);
             });
-        }
+            let chartId = `freeChart_${idx}`;
+            let wrap = document.createElement('div');
+            wrap.className = 'chart-card bg-[#161b22] p-5 rounded-2xl border border-gray-700/50 flex flex-col shadow-lg relative h-[350px]';
+            wrap.innerHTML = `<h3 class="text-sm font-bold text-gray-200 mb-4">📊 ${bestNum} by ${cat}</h3><canvas id="${chartId}"></canvas>`;
+            freeChartsContainer.appendChild(wrap);
+            new Chart(document.getElementById(chartId), {
+                type: idx === 0 ? 'bar' : 'pie',
+                data: {
+                    labels: Object.keys(aggregated).slice(0, 10),
+                    datasets: [{ data: Object.values(aggregated).slice(0, 10), backgroundColor: ['#1f6feb', '#238636', '#f59e0b', '#da3633', '#8957e5'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        });
     }
 
     const renderDataPreview = (dataSlice) => {
         const headers = Object.keys(dataSlice[0]);
         tableHead.innerHTML = `<tr>${headers.map(h => `<th class="px-6 py-4 font-bold text-xs uppercase tracking-wider">${h}</th>`).join('')}</tr>`;
-        tableBody.innerHTML = dataSlice.map(row => 
-            `<tr class="hover:bg-gray-800/40 transition-colors">${headers.map(h => `<td class="px-6 py-3">${row[h] || '-'}</td>`).join('')}</tr>`
-        ).join('');
+        tableBody.innerHTML = dataSlice.map(row => `<tr class="hover:bg-gray-800/40 transition-colors">${headers.map(h => `<td class="px-6 py-3">${row[h] || '-'}</td>`).join('')}</tr>`).join('');
     };
 
-    // ==========================================
-    // 3. PREMIUM AI LOGIC
-    // ==========================================
-    btnAutoAI.addEventListener('click', () => {
-        isUserTriggered = true;
-        executeAI("Generate comprehensive deep analytical dashboard", "auto", 5);
-    });
+    btnAutoAI.addEventListener('click', () => { isUserTriggered = true; executeAI("Full Dashboard Analysis", "auto", 5); });
+    btnCustomAI.addEventListener('click', () => { isUserTriggered = true; executeAI(aiQuestion.value, "custom", 1); });
 
-    btnCustomAI.addEventListener('click', () => {
-        const q = aiQuestion.value.trim();
-        if(!q) return alert("Please type your question first.");
-        isUserTriggered = true;
-        executeAI(q, "custom", 1);
-    });
-
-    async function executeAI(question, mode, cost) {
-        if (!isUserTriggered) return;
-        isUserTriggered = false; 
-
-        const email = sessionStorage.getItem('dashupdata_email');
-        if (!email) return alert('🔒 Please Sync your Account in the sidebar first.');
-        if (!aiPayloadData) return alert('Please upload data first.');
-        
-        if (currentTokens < cost) {
-            alert(`❌ Insufficient tokens. You need ${cost} tokens.`);
-            window.location.href = 'pricing.html';
-            return;
-        }
-
+    async function executeAI(q, mode, cost) {
+        if (!isUserTriggered || currentTokens < cost) return alert("Insufficient tokens.");
         aiLoader.classList.remove('hidden');
-        btnAutoAI.disabled = true;
-        btnCustomAI.disabled = true;
-
-        if (mode === 'custom') {
-            // FIX: Used insertAdjacentHTML to prevent destroying previous Chart instances
-            aiChartsContainer.insertAdjacentHTML('afterbegin', `
-                <div id="tempLoader" class="col-span-full text-center text-blue-400 font-bold py-10 bg-[#0d1117] rounded-2xl border border-blue-900/30 shadow-inner flex flex-col items-center justify-center chart-card">
-                    <div class="loader h-8 w-8 rounded-full border-4 border-t-4 border-blue-500 mb-4"></div>
-                    🧠 Generating AI Insight for: "${question}"
-                </div>
-            `);
-            aiSectionWrapper.classList.remove('hidden');
-            aiSectionWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
         try {
             const res = await fetch(SERVER_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                body: JSON.stringify({ action: 'runInsight', email: email, question: question, dataSummary: aiPayloadData, mode: mode })
+                body: JSON.stringify({ action: 'runInsight', email: sessionStorage.getItem('dashupdata_email'), question: q, dataSummary: aiPayloadData, mode: mode })
             });
-            
             const result = await res.json();
-            
             if (result.status === 'success') {
-                currentTokens -= result.tokensDeducted;
+                currentTokens -= cost;
                 tokenCount.innerText = currentTokens;
                 aiSectionWrapper.classList.remove('hidden');
-                
-                if (mode === 'custom') {
-                    const loader = document.getElementById('tempLoader');
-                    if(loader) loader.remove();
-                }
-
                 renderAICharts(result.insights, mode === 'auto');
-            } else {
-                alert(`Error: ${result.message}`);
-                if (mode === 'custom') {
-                    const loader = document.getElementById('tempLoader');
-                    if(loader) loader.remove();
-                }
             }
-        } catch (err) {
-            console.error(err);
-            alert('⚠️ Network error. Could not connect to Backend.');
-            if (mode === 'custom') {
-                const loader = document.getElementById('tempLoader');
-                if(loader) loader.remove();
-            }
-        } finally {
-            aiLoader.classList.add('hidden');
-            btnAutoAI.disabled = false;
-            btnCustomAI.disabled = false;
-        }
+        } catch (e) { console.error(e); } finally { aiLoader.classList.add('hidden'); }
     }
 
     function renderAICharts(insights, isAuto) {
-        if(isAuto) {
-            aiChartsContainer.innerHTML = '';
-            allCharts.forEach(c => c.destroy());
-            allCharts = [];
-        }
-
+        if(isAuto) aiChartsContainer.innerHTML = '';
         insights.forEach((item, idx) => {
-            let chartId = `aiPremChart_${Date.now()}_${idx}`; 
+            let chartId = `aiChart_${Date.now()}_${idx}`;
             let wrapper = document.createElement('div');
-            wrapper.className = 'chart-card bg-gradient-to-b from-[#0d1117] to-[#010409] p-6 rounded-2xl border border-blue-900/50 flex flex-col shadow-2xl relative overflow-hidden transition-all hover:border-blue-700/60';
-
-            let tag = `<div class="absolute top-0 right-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-bl-xl shadow-lg">PREMIUM AI</div>`;
-
-            wrapper.innerHTML = `
-                ${tag}
-                <div class="flex items-center justify-between mb-4 mt-3">
-                    <h3 class="text-base font-bold text-white flex items-center">
-                        <span class="mr-3 text-xl bg-blue-500/20 p-2 rounded-lg border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]">📊</span> ${item.chartTitle}
-                    </h3>
-                </div>
-
-                <div class="relative w-full h-[260px]">
-                    <canvas id="${chartId}"></canvas>
-                </div>
-
-                <div class="mt-5 grid gap-3 text-sm">
-                    <div class="bg-red-500/10 border border-red-500/20 p-3.5 rounded-xl shadow-inner">
-                        <div class="text-red-400 font-bold text-xs mb-1.5 uppercase tracking-wide flex items-center"><span class="mr-2">⚠</span> Issue Detected</div>
-                        <div class="text-gray-300 leading-relaxed font-medium">${item.issue}</div>
-                    </div>
-
-                    <div class="bg-blue-500/10 border border-blue-500/20 p-3.5 rounded-xl shadow-inner">
-                        <div class="text-blue-400 font-bold text-xs mb-1.5 uppercase tracking-wide flex items-center"><span class="mr-2">💡</span> Insight</div>
-                        <div class="text-gray-300 leading-relaxed font-medium">${item.insight}</div>
-                    </div>
-
-                    <div class="bg-green-500/10 border border-green-500/20 p-3.5 rounded-xl shadow-inner">
-                        <div class="text-green-400 font-bold text-xs mb-1.5 uppercase tracking-wide flex items-center"><span class="mr-2">🚀</span> Action Suggested</div>
-                        <div class="text-gray-300 leading-relaxed font-medium">${item.action}</div>
-                    </div>
-                </div>
-            `;
-            
-            if(isAuto) aiChartsContainer.appendChild(wrapper);
-            else aiChartsContainer.prepend(wrapper); 
-
-            const ctx = document.getElementById(chartId);
-            const type = ['bar','line','pie','doughnut'].includes(item.type) ? item.type : 'bar';
-
-            let newChart = new Chart(ctx, {
-                type: type,
-                data: {
-                    labels: item.labels,
-                    datasets: [{
-                        label: 'Analysis Metrics',
-                        data: item.values,
-                        // FIX: Combined backgroundColor logic to prevent undefined overwrite
-                        backgroundColor: type === 'line' ? 'rgba(56, 139, 253, 0.15)' : ['#388bfd', '#2ea043', '#f59e0b', '#f85149', '#a371f7', '#2cb67d'],
-                        borderRadius: type === 'bar' ? 6 : 0,
-                        borderWidth: type === 'pie' || type === 'doughnut' ? 2 : 2,
-                        borderColor: type === 'line' ? '#388bfd' : '#010409',
-                        fill: type === 'line' ? true : false,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, color: '#8b949e',
-                    plugins: { legend: { display: type !== 'bar', labels: {color:'#8b949e', font:{family:'Inter'}} } },
-                    scales: (type === 'pie' || type === 'doughnut') ? {} : {
-                        x: { ticks: { color: '#8b949e', font:{family:'Inter'} }, grid: { display: false } },
-                        y: { ticks: { color: '#8b949e', font:{family:'Inter'} }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
-                    }
-                }
+            wrapper.className = 'chart-card bg-[#0d1117] p-6 rounded-2xl border border-blue-900/50 shadow-2xl mb-4';
+            wrapper.innerHTML = `<h3 class="text-base font-bold text-white mb-4">📈 ${item.chartTitle}</h3><div class="h-[250px]"><canvas id="${chartId}"></canvas></div><div class="mt-4 text-sm text-gray-400"><b>Insight:</b> ${item.insight}</div>`;
+            aiChartsContainer.prepend(wrapper);
+            new Chart(document.getElementById(chartId), {
+                type: item.type || 'bar',
+                data: { labels: item.labels, datasets: [{ label: 'Metric', data: item.values, backgroundColor: '#388bfd' }] },
+                options: { responsive: true, maintainAspectRatio: false }
             });
-            allCharts.push(newChart);
         });
-        
-        if(isAuto) aiSectionWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // ==========================================
-    // 4. PDF EXPORT (🔥 FIXED: Landscape + Exact Width 🔥)
-    // ==========================================
-    btnPDF.addEventListener('click', async () => {
-        const email = sessionStorage.getItem('dashupdata_email');
-        if(!email || currentTokens < 1) return alert("You need 1 token to download the PDF report.");
-        
-        const originalText = btnPDF.innerHTML;
-        btnPDF.innerHTML = '<span class="loader inline-block h-4 w-4 border-2 border-t-2 border-white rounded-full mr-2"></span> Packing PDF...';
-        btnPDF.disabled = true;
-
-        actionPanelWrapper.style.display = 'none'; 
-        rawDataSection.style.display = 'none'; 
-
-        // scroll reset
-        const exportArea = document.getElementById('pdf-export-area');
-        exportArea.scrollTop = 0; 
-        window.scrollTo(0, 0);
-
-        setTimeout(async () => {
-            try {
-                const res = await fetch(SERVER_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                    body: JSON.stringify({ action: 'deductPdfToken', email: email })
-                });
-
-                const data = await res.json();
-                
-                if(data.status === 'success') {
-                    currentTokens -= 1;
-                    tokenCount.innerText = currentTokens;
-                    
-                    const element = document.getElementById('pdf-export-area');
-
-                    // ✅ FORCE FULL WIDTH
-                    const originalWidth = element.style.width;
-                    const originalMaxWidth = element.style.maxWidth;
-
-                    element.style.width = element.scrollWidth + "px";
-                    element.style.maxWidth = "none";
-
-                    // wait for charts render properly
-                    await new Promise(res => setTimeout(res, 400));
-
-                    const opt = {
-                        margin: [5, 5, 5, 5],
-                        filename: `DashupData_Report_${new Date().toISOString().split('T')[0]}.pdf`,
-                        image: { type: 'jpeg', quality: 1 },
-
-                        html2canvas: {
-                            scale: 2,
-                            useCORS: true,
-                            scrollX: 0,
-                            scrollY: 0,
-                            windowWidth: element.scrollWidth,
-                            windowHeight: element.scrollHeight
-                        },
-
-                        jsPDF: {
-                            unit: 'mm',
-                            format: 'a4',
-                            orientation: 'landscape'
-                        },
-
-                        // 🔥 FINAL PAGE BREAK FIX
-                        pagebreak: { 
-                            mode: ['css', 'legacy'],
-                            before: '.chart-card',
-                            avoid: ['.chart-card']
-                        }
-                    };
-
-                    await html2pdf().set(opt).from(element).save();
-
-                    // ✅ RESTORE ORIGINAL STATE
-                    element.style.width = originalWidth;
-                    element.style.maxWidth = originalMaxWidth;
-
-                } else {
-                    throw new Error(data.message);
-                }
-
-            } catch(err) {
-                alert('PDF Export Failed: ' + err.message);
-            } finally {
-                actionPanelWrapper.style.display = 'block';
-                rawDataSection.style.display = 'block';
-                btnPDF.innerHTML = originalText;
-                btnPDF.disabled = false;
-            }
-        }, 150);
-    });
-});
-
-document.getElementById('btnClear').addEventListener('click', () => {
-    if(confirm('Clear all visual data and start fresh?')) {
-        sessionStorage.removeItem('aiPayloadData');
-        location.reload();
-    }
+    document.getElementById('btnClear').addEventListener('click', () => { if(confirm('Fresh Start?')) location.reload(); });
 });
