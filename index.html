@@ -1,140 +1,82 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DashupData - Turn CSVs into AI Dashboards</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .glass { background: rgba(31, 41, 55, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-    </style>
+  <meta charset="UTF-8">
+  <title>Maintenance | DashupData</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+
+    .loader {
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .footer {
+      font-size: 13px;
+      opacity: 0.6;
+      margin-top: 15px;
+    }
+  </style>
 </head>
-<body class="bg-gray-950 text-white font-sans antialiased selection:bg-blue-500/30">
-    
-    <nav class="fixed w-full z-50 glass top-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-20 items-center">
-            
-            <a href="index.html" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
-                <img src="logo.png" alt="DashupData Logo" class="h-9 w-auto">
-                <span class="text-2xl md:text-3xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">DashupData</span>
-            </a>
 
-            <div class="space-x-8 hidden md:flex items-center text-sm font-medium text-gray-300">
-                <a href="#features" class="hover:text-white transition-colors">Features</a>
-                <a href="pricing.html" class="hover:text-white transition-colors">Pricing</a>
-                <a href="app.html" class="bg-white text-gray-900 hover:bg-gray-200 px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-white/10">Launch App</a>
-            </div>
-        </div>
-    </nav>
+<body>
 
-    <main>
-        <section class="pt-40 pb-24 px-4 text-center relative overflow-hidden">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[120px] -z-10"></div>
-            <h1 class="text-6xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
-                Turn your raw CSVs into <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">AI-Powered Dashboards</span>
-            </h1>
-            <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">Instantly visualize your data, uncover hidden trends, and generate strategic insights with our advanced AI analyst. No coding required.</p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="app.html" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center">
-                    Get Started Free
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                </a>
-                <a href="pricing.html" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center">View Pricing</a>
-            </div>
-        </section>
+  <div class="container">
+    <h1>🚧 Site Under Maintenance</h1>
+    <p>
+      We're currently fixing some issues and improving your experience.<br>
+      Please check back soon.
+    </p>
 
-        <section id="features" class="py-24 bg-gray-900/30 border-y border-gray-800/50">
-            <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-8">
-                <div class="glass p-8 rounded-2xl hover:border-blue-500/50 transition-colors">
-                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 text-blue-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">Instant Visualizations</h3>
-                    <p class="text-gray-400 leading-relaxed">Drag and drop your files. DashAI automatically parses the data and generates clean, interactive charts.</p>
-                </div>
-                <div class="glass p-8 rounded-2xl hover:border-indigo-500/50 transition-colors">
-                    <div class="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center mb-6 text-indigo-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">AI Analyst</h3>
-                    <p class="text-gray-400 leading-relaxed">Stop manually hunting for trends. One click generates automated summaries, anomalies, and business suggestions.</p>
-                </div>
-                <div class="glass p-8 rounded-2xl hover:border-purple-500/50 transition-colors">
-                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-6 text-purple-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">Export to PDF</h3>
-                    <p class="text-gray-400 leading-relaxed">Generate a professional, ready-to-share PDF report containing your data previews, charts, and AI insights.</p>
-                </div>
-            </div>
-        </section>
+    <div class="loader"></div>
 
-        <section id="faq" class="py-24 px-4 max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-white">Frequently Asked Questions</h2>
-                <p class="text-gray-400 text-lg">Everything you need to know about DashupData and how it works.</p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="glass p-8 rounded-2xl hover:border-blue-500/40 transition-colors">
-                    <h4 class="text-xl font-bold mb-3 text-blue-400">Do I need coding skills to use this?</h4>
-                    <p class="text-gray-400 leading-relaxed">Not at all! DashupData is a 100% no-code platform. Just upload your CSV file, and our AI automatically handles the parsing, charting, and data analysis.</p>
-                </div>
-                
-                <div class="glass p-8 rounded-2xl hover:border-indigo-500/40 transition-colors">
-                    <h4 class="text-xl font-bold mb-3 text-indigo-400">Is my data secure?</h4>
-                    <p class="text-gray-400 leading-relaxed">Yes. We process your data securely. We don't train our models on your private data, and your privacy is our top priority.</p>
-                </div>
+    <div class="footer">
+      © 2026 DashupData
+    </div>
+  </div>
 
-                <div class="glass p-8 rounded-2xl hover:border-purple-500/40 transition-colors">
-                    <h4 class="text-xl font-bold mb-3 text-purple-400">How does the AI Analyst work?</h4>
-                    <p class="text-gray-400 leading-relaxed">Our built-in AI scans your dataset to identify patterns, anomalies, and key metrics, then generates a plain-English summary to help you make business decisions instantly.</p>
-                </div>
-
-                <div class="glass p-8 rounded-2xl hover:border-pink-500/40 transition-colors">
-                    <h4 class="text-xl font-bold mb-3 text-pink-400">Can I export my dashboards?</h4>
-                    <p class="text-gray-400 leading-relaxed">Yes! You can easily export your visual charts and AI-generated insights into a clean, professional PDF report ready to be shared with your team or clients.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-gray-950/50 py-16 border-t border-gray-800 text-sm text-gray-500">
-        <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 text-left">
-            
-            <div class="space-y-4 col-span-1">
-                <div class="flex items-center gap-2">
-                    <img src="logo.png" alt="DashupData Logo" class="h-6 w-auto">
-                    <span class="text-lg font-bold text-gray-300">DashupData</span>
-                </div>
-                <p class="text-xs text-gray-600">Built for modern data teams.</p>
-                <div class="text-xs text-gray-600">
-                    <p>Support:Himanshusehgal320@gmail.com</p>
-                    <p>Panchkula, Haryana , India</p>
-                </div>
-            </div>
-
-            <div class="space-y-3 col-span-2">
-                <h4 class="text-gray-300 font-semibold mb-4 text-xs uppercase tracking-wider">Legal & Compliance</h4>
-                <div class="flex flex-wrap gap-x-8 gap-y-3">
-                    <a href="about.html" class="hover:text-white transition-colors">About Us</a>
-                    <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
-                    <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="refund.html" class="hover:text-white transition-colors">Refund Policy</a>
-                    <a href="shipping.html" class="hover:text-white transition-colors">Shipping Policy</a>
-                    <a href="contact.html" class="hover:text-white transition-colors">Contact Us</a>
-                </div>
-            </div>
-
-            <div class="flex flex-col items-center md:items-end justify-center col-span-1">
-                <div class="grayscale opacity-50 flex items-center gap-2">
-                    <span class="text-[10px] text-gray-700 uppercase tracking-widest">Payments Secured by</span>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg" alt="Razorpay" class="h-4">
-                </div>
-                <p class="mt-4 text-[11px] text-gray-800 text-center md:text-right">&copy; 2026 DashupData. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>
