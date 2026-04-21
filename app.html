@@ -47,8 +47,6 @@
     <div id="mobileTabs" class="md:hidden flex w-full bg-[#0d1117] border-b border-gray-800 z-[2000] flex-shrink-0 items-center px-2 py-1">
         <a href="index.html" class="p-2 bg-gray-800/60 hover:bg-gray-700 rounded-lg text-xl border border-gray-700 shadow-sm shrink-0 transition-colors" title="Home">🏠</a>
         
-        <a href="Sample.csv" download class="p-2 ml-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-xl border border-blue-500/30 shadow-sm shrink-0 transition-colors" title="Download Sample CSV">📥</a>
-        
         <div class="flex-1 flex mx-2">
             <button onclick="setMobileTab('actions')" id="tabBtnActions" class="flex-1 py-2 text-xs sm:text-sm font-bold transition-colors text-blue-400 border-b-2 border-blue-500 shadow-[inset_0_-2px_10px_rgba(59,130,246,0.1)] truncate px-1">Setup</button>
             <button onclick="setMobileTab('dashboard')" id="tabBtnDashboard" class="flex-1 py-2 text-xs sm:text-sm font-bold transition-colors text-gray-500 border-b-2 border-transparent truncate px-1">Dashboard</button>
@@ -71,10 +69,6 @@
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto hidden md:block">
             <a href="index.html" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors font-medium text-sm"><span class="text-lg mr-3">🏠</span> Home</a>
             <a href="#" class="flex items-center px-4 py-3 rounded-lg bg-blue-600/10 text-blue-400 font-semibold text-sm border border-blue-500/20"><span class="text-lg mr-3">🗂️</span> Workspace</a>
-            
-            <a href="Sample.csv" download class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-600/10 text-blue-400 transition-colors font-medium text-sm border border-blue-500/20">
-               <span class="text-lg mr-3">📥</span> Sample CSV
-            </a>
             
             <a href="pricing.html" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800/50 text-gray-400 transition-colors font-medium text-sm"><span class="text-lg mr-3">⚡</span> Upgrade Plan</a>
         </nav>
@@ -163,9 +157,6 @@
                             <h3 class="text-base font-bold text-gray-200 flex items-center">
                                  <span class="text-xl mr-2">🗄️</span> Raw Data Preview (Sample)
                             </h3>
-                            <button id="btnDownloadCSV" class="w-full sm:w-auto bg-[#21262d] hover:bg-[#30363d] text-gray-300 px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center border border-gray-600 shadow-sm">
-                                <span class="mr-2">💾</span> Download Data (.csv)
-                            </button>
                         </div>
                         <div class="overflow-auto flex-1 rounded-xl border border-gray-700/80 bg-[#010409] custom-scrollbar">
                             <table class="w-full text-left text-sm whitespace-nowrap">
@@ -237,8 +228,7 @@
             const btnAutoAI = document.getElementById('btnAutoAI');
             const btnCustomAI = document.getElementById('btnCustomAI');
             const btnPDF = document.getElementById('btnPDF');
-            const btnPivot = document.getElementById('btnPivot'); // 🔥 Added Element
-            const btnDownloadCSV = document.getElementById('btnDownloadCSV');
+            const btnPivot = document.getElementById('btnPivot'); 
             const aiQuestion = document.getElementById('aiQuestion');
             const aiLoader = document.getElementById('aiLoader');
             
@@ -350,18 +340,6 @@
                     }
                 });
             };
-
-            btnDownloadCSV.addEventListener('click', () => {
-                if(!originalCSVData) return alert("No data available to download.");
-                const blob = new Blob([originalCSVData], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement("a");
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", `DashupData_Export_${Date.now()}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
 
             function generateKPICards(rows) {
                 const totalRows = rows.length;
