@@ -16,7 +16,7 @@ We strongly recommend upgrading to a supported version to ensure you receive the
 If you discover a security vulnerability, please report it responsibly.
 
 📩 How to Report
-Send an email to: security@yourdomain.com
+Send an email to: himanshusehgal320@gmail.com
 Or create a private security advisory on GitHub (preferred for sensitive issues)
 📝 What to Include
 
