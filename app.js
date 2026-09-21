@@ -95,24 +95,77 @@ document.addEventListener('DOMContentLoaded', () => {
     fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); e.target.value = ''; });
     
     const handleFile = (file) => {
-        if(!file.name.endsWith('.csv')) return alert('Please upload a valid CSV file.');
-        Papa.parse(file, {
-            header: true, skipEmptyLines: true,
-            complete: (results) => {
-                if(results.data && results.data.length > 1) {
-                    originalCSVData = Papa.unparse(results.data);
-                    aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
-                    generateKPICards(results.data);
-                    generateFreeDynamicCharts(results.data);
-                    renderDataPreview(results.data.slice(0, 50)); 
-                    dropZone.classList.add('hidden');
-                    actionPanelWrapper.classList.remove('hidden'); 
-                    dashboardContent.classList.remove('hidden');
-                }
-            }
-        });
-    };
+        const fileName = (file.name || '').toLowerCase();
+        const isCSV = fileName.endsWith('.csv');
+        const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
 
+        if(!isCSV && !isExcel) {
+            return alert('Please upload a valid CSV or Excel file (.csv, .xlsx, .xls).');
+        }
+
+        const processRows = (rows) => {
+            if(!Array.isArray(rows) || rows.length < 2) {
+                return alert('The uploaded file is empty or does not contain enough data.');
+            }
+
+            // Normalize the workbook data into CSV so the existing dashboard,
+            // Pivot and AI logic can use the same internal format.
+            originalCSVData = Papa.unparse(rows);
+            aiPayloadData = Papa.unparse(rows.slice(0, 50));
+
+            generateKPICards(rows);
+            generateFreeDynamicCharts(rows);
+            renderDataPreview(rows.slice(0, 50));
+
+            dropZone.classList.add('hidden');
+            actionPanelWrapper.classList.remove('hidden');
+            dashboardContent.classList.remove('hidden');
+        };
+
+        if(isCSV) {
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => processRows(results.data),
+                error: (error) => alert('CSV file could not be read: ' + error.message)
+            });
+            return;
+        }
+
+        // Excel parsing happens locally in the browser. The workbook is not
+        // uploaded to Render or any other server.
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                if(typeof XLSX === 'undefined') {
+                    throw new Error('Excel parser failed to load. Please refresh the page.');
+                }
+
+                const workbook = XLSX.read(event.target.result, {
+                    type: 'array',
+                    cellDates: true
+                });
+
+                if(!workbook.SheetNames || workbook.SheetNames.length === 0) {
+                    throw new Error('The Excel workbook has no worksheets.');
+                }
+
+                // Use the first worksheet as the dashboard data source.
+                // This keeps the current single-dataset dashboard behavior.
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, {
+                    defval: '',
+                    raw: false
+                });
+
+                processRows(rows);
+            } catch(error) {
+                alert('Excel file could not be read: ' + error.message);
+            }
+        };
+        reader.onerror = () => alert('Excel file could not be read.');
+        reader.readAsArrayBuffer(file);
+    };
     // ==========================================
     // 3. THE ORIGINAL FREE CHARTS LOGIC
     // ==========================================
