@@ -6,6 +6,7 @@
     <title>DashupData - AI Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -94,9 +95,9 @@
                     <span class="text-3xl md:text-4xl transition-transform duration-300 group-hover:-translate-y-1">📤</span>
                 </div>
                 <h3 class="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight">Upload your dataset</h3>
-                <p class="text-sm md:text-base text-gray-400 font-medium mb-4">Drag & drop a CSV file here, or click to browse</p>
-                <p class="text-xs text-gray-500">Supported format: <span class="text-blue-400 font-semibold">.CSV</span></p>
-                <input type="file" id="fileInput" class="hidden" accept=".csv">
+                <p class="text-sm md:text-base text-gray-400 font-medium mb-4">Drag & drop a CSV or Excel file here, or click to browse</p>
+                <p class="text-xs text-gray-500">Supported formats: <span class="text-blue-400 font-semibold">.CSV, .XLSX, .XLS</span></p>
+                <input type="file" id="fileInput" class="hidden" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
             </div>
 
             <div id="actionPanelWrapper" class="hidden">
@@ -315,33 +316,79 @@
             });
             
             const handleFile = (file) => {
-                if(!file.name.endsWith('.csv')) return alert('Please upload a valid CSV file.');
-                
-                Papa.parse(file, {
-                    header: true, skipEmptyLines: true,
-                    complete: (results) => {
-                        if(results.data && results.data.length > 1) {
-                            originalCSVData = Papa.unparse(results.data);
-                            aiPayloadData = Papa.unparse(results.data.slice(0, 50)); 
-                            
-                            generateKPICards(results.data);
-                            generateFreeDynamicCharts(results.data);
-                            renderDataPreview(results.data.slice(0, 50)); 
-                            
-                            dropZone.classList.add('hidden');
-                            actionPanelWrapper.classList.remove('hidden'); 
-                            dashboardContent.classList.remove('hidden');
+                const fileName = (file.name || '').toLowerCase();
+                const isCSV = fileName.endsWith('.csv');
+                const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
 
-                            aiLoader.classList.add('hidden');
-                            btnAutoAI.disabled = false;
-                            btnCustomAI.disabled = false;
-                        } else {
-                            alert('CSV file is empty or invalid.');
-                        }
+                if(!isCSV && !isExcel) {
+                    return alert('Please upload a valid CSV or Excel file (.csv, .xlsx, .xls).');
+                }
+
+                const processRows = (rows) => {
+                    if(!Array.isArray(rows) || rows.length < 2) {
+                        return alert('The uploaded file is empty or does not contain enough data.');
                     }
-                });
-            };
 
+                    // Normalize all supported files to CSV internally so the
+                    // existing dashboard/Pivot/AI logic remains unchanged.
+                    originalCSVData = Papa.unparse(rows);
+                    aiPayloadData = Papa.unparse(rows.slice(0, 50));
+
+                    generateKPICards(rows);
+                    generateFreeDynamicCharts(rows);
+                    renderDataPreview(rows.slice(0, 50));
+
+                    dropZone.classList.add('hidden');
+                    actionPanelWrapper.classList.remove('hidden');
+                    dashboardContent.classList.remove('hidden');
+
+                    aiLoader.classList.add('hidden');
+                    btnAutoAI.disabled = false;
+                    btnCustomAI.disabled = false;
+                };
+
+                if(isCSV) {
+                    Papa.parse(file, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: (results) => processRows(results.data),
+                        error: (error) => alert('CSV file could not be read: ' + error.message)
+                    });
+                    return;
+                }
+
+                // Excel parsing is fully local in the browser.
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        if(typeof XLSX === 'undefined') {
+                            throw new Error('Excel parser failed to load. Please refresh the page.');
+                        }
+
+                        const workbook = XLSX.read(event.target.result, {
+                            type: 'array',
+                            cellDates: true
+                        });
+
+                        if(!workbook.SheetNames || workbook.SheetNames.length === 0) {
+                            throw new Error('The Excel workbook has no worksheets.');
+                        }
+
+                        // Use the first worksheet as the dashboard data source.
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(sheet, {
+                            defval: '',
+                            raw: false
+                        });
+
+                        processRows(rows);
+                    } catch(error) {
+                        alert('Excel file could not be read: ' + error.message);
+                    }
+                };
+                reader.onerror = () => alert('Excel file could not be read.');
+                reader.readAsArrayBuffer(file);
+            };
             function generateKPICards(rows) {
                 const totalRows = rows.length;
                 const headers = Object.keys(rows[0]);
