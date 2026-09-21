@@ -733,8 +733,12 @@
             currentTokens -= 1;
             tokenCount.innerText = currentTokens;
 
-            // 🔥 REAL PDF GENERATION
+            // 🔥 LOCAL PDF GENERATION — no Render/server PDF call
             const element = document.getElementById("dashboardContent");
+            if (!element) throw new Error("Dashboard content was not found.");
+            if (typeof html2pdf !== "function") {
+                throw new Error("PDF library failed to load. Please refresh and try again.");
+            }
 
             // hide unwanted UI
             document.getElementById("actionPanelWrapper").style.display = "none";
