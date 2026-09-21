@@ -1,6 +1,7 @@
 // 🚨 CONFIGURATION 🚨
 const SERVER_URL = 'https://script.google.com/macros/s/AKfycbztwYUg3Joq4bvtubCnqcM6OpLHs1hvpGjvXyhGoSPwtI8doNBMEINTHkQ7jZr-OAR6/exec';
-const RENDER_BASE_URL = 'https://support-dashupdata.onrender.com';
+// Render is used only for Pivot generation. PDF generation is fully client-side.
+const PIVOT_API_URL = 'https://support-dashupdata.onrender.com/generate-pivot';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
@@ -231,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTokens -= 1;
                 tokenCount.innerText = currentTokens;
 
-                const response = await fetch(`${RENDER_BASE_URL}/generate-pivot`, {
+                const response = await fetch(PIVOT_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ csv_data: originalCSVData })
@@ -250,41 +251,80 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPDF.addEventListener('click', async () => {
         const email = sessionStorage.getItem('dashupdata_email');
         if(!email || currentTokens < 1) return alert("Insufficient tokens.");
-        
-        btnPDF.innerHTML = 'Waking Server (50s)...';
+
+        const originalText = btnPDF.innerHTML;
+        btnPDF.innerHTML = 'Generating PDF...';
         btnPDF.disabled = true;
 
+        const actionPanel = document.getElementById('actionPanelWrapper');
+        const mobileAside = document.getElementById('mobileAside');
+        const mobileTabs = document.getElementById('mobileTabs');
+
         try {
-            // Step 1: Token Deduct
+            // Deduct the PDF token through the existing Google Apps Script.
             const tokenRes = await fetch(SERVER_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'text/plain;charset=utf-8'},
                 body: JSON.stringify({ action: 'deductPdfToken', email: email })
             });
+
             const tData = await tokenRes.json();
-            
-            if(tData.status === 'success') {
-                currentTokens -= 1;
-                tokenCount.innerText = currentTokens;
-                
-                // 🔥 FIXED PDF FETCH: Using JSON Body to avoid URL length issues
-                const pdfRes = await fetch(`${RENDER_BASE_URL}/export-dashboard-pdf`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: window.location.href })
-                });
 
-                if (!pdfRes.ok) throw new Error("Backend could not generate PDF");
-
-                const blob = await pdfRes.blob();
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = `AI_Report_${Date.now()}.pdf`;
-                link.click();
+            if(tData.status !== 'success') {
+                throw new Error(tData.message || 'Unable to deduct PDF token.');
             }
-        } catch(e) { alert("PDF Error: " + e.message); } finally { btnPDF.innerHTML = '📄 Export Report (-1)'; btnPDF.disabled = false; }
-    });
 
+            currentTokens -= 1;
+            tokenCount.innerText = currentTokens;
+
+            // Generate the PDF entirely in the customer's browser.
+            // No dashboard URL or customer data is sent to Render for PDF creation.
+            const element = document.getElementById('dashboardContent');
+            if(!element) throw new Error('Dashboard content was not found.');
+
+            if(actionPanel) actionPanel.style.display = 'none';
+            if(mobileAside) mobileAside.style.display = 'none';
+            if(mobileTabs) mobileTabs.style.display = 'none';
+
+            // Give charts/layout a moment to settle before capture.
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            if(typeof html2pdf !== 'function') {
+                throw new Error('PDF library failed to load. Please refresh and try again.');
+            }
+
+            const opt = {
+                margin: 5,
+                filename: `DashupData_Report_${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#0a0a0a',
+                    logging: false
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'landscape'
+                },
+                pagebreak: {
+                    mode: ['css', 'legacy']
+                }
+            };
+
+            await html2pdf().set(opt).from(element).save();
+
+        } catch(e) {
+            alert('PDF Export Failed: ' + e.message);
+        } finally {
+            if(actionPanel) actionPanel.style.display = '';
+            if(mobileAside) mobileAside.style.display = '';
+            if(mobileTabs) mobileTabs.style.display = '';
+            btnPDF.innerHTML = originalText;
+            btnPDF.disabled = false;
+        }
+    });
     // ==========================================
     // 5. PREMIUM AI LOGIC & STYLED CHARTS
     // ==========================================
